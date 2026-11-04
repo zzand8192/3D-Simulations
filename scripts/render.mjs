@@ -43,6 +43,7 @@ const DURATION = JSON.parse(await readFile(join(SRC, 'cues.json'), 'utf8')).dura
 async function openPage() {
   const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
+  page.setDefaultTimeout(0);
   page.on('pageerror', (e) => console.log('[pageerror]', e.message));
   page.on('console', (m) => { if (m.type() === 'error') console.log('[page]', m.text()); });
   await page.goto(url);
@@ -53,7 +54,7 @@ async function openPage() {
     browser,
     async frame(t, type = 'jpeg') {
       await page.evaluate((tt) => window.renderAt(tt), t);
-      return page.screenshot({ clip, type, ...(type === 'jpeg' ? { quality: 94 } : {}) });
+      return page.screenshot({ clip, type, timeout: 0, ...(type === 'jpeg' ? { quality: 94 } : {}) });
     },
   };
 }
