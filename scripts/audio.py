@@ -9,7 +9,8 @@ import json, os, wave
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-cues = json.load(open(os.path.join(ROOT, 'src', 'cues.json')))
+import sys
+cues = json.load(open(sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'src', 'cues.json')))
 SR = 44100
 DUR = cues['duration']
 N = int(SR * DUR)
@@ -187,7 +188,7 @@ fade = np.ones(N); fi = int(0.4 * SR); fo = int(1.2 * SR); fade[:fi] = np.linspa
 L *= fade; R *= fade
 peak = max(np.max(np.abs(L)), np.max(np.abs(R)))
 L, R = L / peak * 0.85, R / peak * 0.85
-out = os.path.join(ROOT, 'output', 'audio.wav'); os.makedirs(os.path.dirname(out), exist_ok=True)
+out = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, 'output', 'audio.wav'); os.makedirs(os.path.dirname(out), exist_ok=True)
 with wave.open(out, 'wb') as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
     w.writeframes((np.stack([L, R], 1) * 32767).astype('<i2').tobytes())

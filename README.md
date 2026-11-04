@@ -6,6 +6,8 @@ A 70-second vertical (1080 × 1920, 9:16) 3D short that plays out like a cinemat
 
 There is no narrator and no voice acting. The story is told through what the characters do, their dialogue in speech bubbles over their heads, fictional news graphics, small serif side labels, and synthesized sound effects and music.
 
+> **Making another video?** See [`docs/MAKING-VIDEOS.md`](docs/MAKING-VIDEOS.md) for the full playbook (style rules, engine API, workflow, camera math, pitfalls). [`CLAUDE.md`](CLAUDE.md) holds the short rules that Claude Code loads automatically.
+
 ## Story
 
 | Time | Label | What happens |

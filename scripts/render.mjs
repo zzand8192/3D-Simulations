@@ -5,6 +5,7 @@
 //   node scripts/render.mjs --workers 3              render segments in parallel, then join
 //   node scripts/render.mjs --from 13 --to 21 --out output/clip.mp4 --no-audio
 //   node scripts/render.mjs --stills 3,15,36         -> output/stills/*.png
+//   node scripts/render.mjs --src projects/my-video --out output/my-video.mp4 --workers 3
 import { createServer } from 'node:http';
 import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -18,11 +19,11 @@ let chromium;
 try { ({ chromium } = require('playwright')); } catch { ({ chromium } = await import('playwright')); }
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const SRC = join(ROOT, 'src');
 const args = Object.fromEntries(process.argv.slice(2).reduce((a, v, i, arr) => {
   if (v.startsWith('--')) a.push([v.slice(2), arr[i + 1] && !arr[i + 1].startsWith('--') ? arr[i + 1] : true]);
   return a;
 }, []));
+const SRC = resolve(ROOT, args.src || 'src');      // project folder (index.html, cues.json, ...)
 const FPS = Number(args.fps || 30);
 const OUT = resolve(ROOT, args.out || 'output/what-if-underwater.mp4');
 const WORKERS = Number(args.workers || 1);
@@ -92,8 +93,9 @@ if (args.stills) {
   await writeFile(join(tmp, 'list.txt'), segs.map((s) => `file '${s.file}'`).join('\n'));
   const video = join(tmp, 'video.mp4');
   spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', join(tmp, 'list.txt'), '-c', 'copy', video], { stdio: 'inherit' });
-  const audio = join(ROOT, 'output', 'audio.wav');
-  if (!args['no-audio']) spawnSync('python3', [join(ROOT, 'scripts', 'audio.py')], { stdio: 'inherit' });
+  const audio = join(dirname(OUT), 'audio.wav');
+  const audioScript = existsSync(join(SRC, 'audio.py')) ? join(SRC, 'audio.py') : join(ROOT, 'scripts', 'audio.py');
+  if (!args['no-audio']) spawnSync('python3', [audioScript, join(SRC, 'cues.json'), audio], { stdio: 'inherit' });
   if (!args['no-audio'] && existsSync(audio)) {
     spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', video, '-ss', String(from), '-t', String(to - from), '-i', audio,
       '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-af', 'loudnorm=I=-14:TP=-1.5:LRA=11', '-c:a', 'aac', '-b:a', '192k', '-ar', '48000', '-shortest', '-movflags', '+faststart', OUT], { stdio: 'inherit' });
