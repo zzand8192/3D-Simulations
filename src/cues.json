@@ -1,0 +1,245 @@
+{
+  "duration": 70,
+  "title": {
+    "text": "What if every human could breathe underwater?",
+    "start": 0.35,
+    "hold": 4.0,
+    "morph": 6.0
+  },
+  "labels": [
+    {
+      "start": 4.9,
+      "end": 11.0,
+      "k": "DAY #1",
+      "v": "THE FIRST DISCOVERY"
+    },
+    {
+      "start": 11.3,
+      "end": 21.3,
+      "k": "MINUTES LATER",
+      "v": "THE DISCOVERY SPREADS"
+    },
+    {
+      "start": 21.8,
+      "end": 35.1,
+      "k": "BREAKING NEWS",
+      "v": "GLOBAL PHENOMENON"
+    },
+    {
+      "start": 35.7,
+      "end": 42.9,
+      "k": "DAY #2",
+      "v": "SCIENTISTS BAFFLED"
+    },
+    {
+      "start": 43.5,
+      "end": 54.1,
+      "k": "WEEK #3",
+      "v": "EVERYDAY LIFE CHANGES"
+    },
+    {
+      "start": 54.7,
+      "end": 62.1,
+      "k": "YEAR #15",
+      "v": "UNDERWATER SETTLEMENTS"
+    },
+    {
+      "start": 62.7,
+      "end": 68.6,
+      "k": "YEAR #15",
+      "v": "SOME THINGS NEVER CHANGE"
+    }
+  ],
+  "subs": [
+    {
+      "id": "sam1",
+      "start": 9.2,
+      "who": "sam",
+      "text": "Wait… what?",
+      "end": 10.9
+    },
+    {
+      "id": "sam2",
+      "start": 11.5,
+      "who": "sam",
+      "text": "Guys, you can breathe down there!",
+      "end": 14.1
+    },
+    {
+      "id": "mia1",
+      "start": 15.0,
+      "who": "mia",
+      "text": "Oh my gosh. He’s right!",
+      "end": 16.9
+    },
+    {
+      "id": "guard1",
+      "start": 17.3,
+      "who": "guard",
+      "text": "Everybody out of the water!",
+      "end": 19.6
+    },
+    {
+      "id": "swim1",
+      "start": 19.1,
+      "who": "swimmer",
+      "text": "WE CAN BREATHE DOWN HERE!",
+      "end": 21.3
+    },
+    {
+      "id": "anc1",
+      "start": 21.9,
+      "who": "anchor",
+      "text": "Breaking news. Reports are emerging worldwide that humans can now breathe underwater.",
+      "end": 26.8
+    },
+    {
+      "id": "rep1",
+      "start": 28.4,
+      "who": "reporter",
+      "text": "Authorities are urging people to remain cautious as this extraordinary phenomenon continues to spread.",
+      "end": 35.3
+    },
+    {
+      "id": "sci1",
+      "start": 36.2,
+      "who": "sci1",
+      "text": "His oxygen levels are normal.",
+      "end": 38.2
+    },
+    {
+      "id": "sci2",
+      "start": 38.3,
+      "who": "sci2",
+      "text": "That shouldn’t be possible.",
+      "end": 40.0
+    },
+    {
+      "id": "sci3",
+      "start": 40.1,
+      "who": "sci1",
+      "text": "Well… apparently it is.",
+      "end": 42.6
+    },
+    {
+      "id": "sand1",
+      "start": 49.8,
+      "who": "dan",
+      "text": "Are you serious?",
+      "end": 51.7
+    },
+    {
+      "id": "anc2",
+      "start": 57.6,
+      "who": "anchor",
+      "text": "The world’s first permanent underwater residential community has officially opened.",
+      "end": 62.3
+    },
+    {
+      "id": "nb1",
+      "start": 64.4,
+      "who": "nb1",
+      "text": "You can’t park there!",
+      "end": 66.3
+    },
+    {
+      "id": "nb2",
+      "start": 66.4,
+      "who": "nb2",
+      "text": "It’s literally the ocean!",
+      "end": 68.6
+    }
+  ],
+  "shots": {
+    "beach": [
+      0,
+      6
+    ],
+    "dive": [
+      6,
+      11
+    ],
+    "surface": [
+      11,
+      14.2
+    ],
+    "spread": [
+      14.2,
+      17
+    ],
+    "guard": [
+      17,
+      21.5
+    ],
+    "studio": [
+      21.5,
+      26.9
+    ],
+    "cutA": [
+      26.9,
+      27.6
+    ],
+    "cutB": [
+      27.6,
+      28.2
+    ],
+    "reporter": [
+      28.2,
+      35.4
+    ],
+    "lab": [
+      35.4,
+      43.2
+    ],
+    "chair": [
+      43.2,
+      45.8
+    ],
+    "school": [
+      45.8,
+      48.4
+    ],
+    "sandwich": [
+      48.4,
+      51.8
+    ],
+    "phone": [
+      51.8,
+      54.4
+    ],
+    "city": [
+      54.4,
+      57.4
+    ],
+    "tv": [
+      57.4,
+      62.4
+    ],
+    "parking": [
+      62.4,
+      70
+    ]
+  },
+  "news": [
+    {
+      "start": 21.5,
+      "end": 26.9,
+      "place": "WORLD 24 · NEWSROOM"
+    },
+    {
+      "start": 26.9,
+      "end": 27.6,
+      "place": "LIVE · SYDNEY, AUSTRALIA"
+    },
+    {
+      "start": 27.6,
+      "end": 28.2,
+      "place": "LIVE · TOKYO, JAPAN"
+    },
+    {
+      "start": 28.2,
+      "end": 35.4,
+      "place": "LIVE · MIAMI BEACH, FLORIDA"
+    }
+  ]
+}

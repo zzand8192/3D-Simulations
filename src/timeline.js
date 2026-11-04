@@ -1,263 +1,326 @@
-// Shot list, camera moves, character performance and text cues.
+// Shot list: cameras, acting and story beats. Text timing lives in cues.json.
 import * as THREE from 'three';
-import { seg, lerp, ease, rng } from './env.js';
-import { motion } from './character.js';
-
-export const DURATION = 47;
-
-// ---------------------------------------------------------------- text cues
-export const cues = {
-  titles: [
-    { start: 0.5, end: 5.9, text: 'What if humans could breathe underwater?' },
-    { start: 42.3, end: 46.4, text: 'What if humans could breathe underwater?' },
-  ],
-  labels: [
-    { start: 1.9, end: 6.1, k: 'THE FIRST HUMAN', v: 'DAY #1' },
-    { start: 7.2, end: 12.6, k: 'DEPTH', v: '10 METERS' },
-    { start: 22.2, end: 27.8, k: 'DEPTH', v: '200 METERS' },
-    { start: 30.0, end: 34.3, k: 'UNDERWATER CITY', v: 'YEAR #25' },
-  ],
-  subs: [
-    { start: 9.9, end: 12.9, who: 'max', text: 'Wait… I can actually breathe down here?' },
-    { start: 15.3, end: 17.9, who: 'leo', text: 'Bro, why are you sitting down here?' },
-    { start: 18.2, end: 19.9, who: 'max', text: 'I live here now.' },
-    { start: 23.4, end: 25.9, who: 'leo', text: 'My snorkel is not helping.' },
-    { start: 26.2, end: 28.4, who: 'max', text: 'It was never helping.' },
-    { start: 35.3, end: 37.9, who: 'max', text: 'You know you don’t need that anymore, right?' },
-    { start: 38.2, end: 40.1, who: 'leo', text: 'It’s part of my look now.' },
-  ],
-};
-
-// dip-to-black between sets
-export function fadeAt(t) {
-  const dips = [[6.15, 6.5, 6.85], [28.6, 29.0, 29.5], [46.2, 47, 99]];
-  for (const [a, m, b] of dips) {
-    if (t >= a && t <= m) return ease.io((t - a) / (m - a));
-    if (t > m && t <= b) return 1 - ease.io((t - m) / (b - m));
-  }
-  return t < 0.35 ? 1 - t / 0.35 : 0;
-}
+import { seg, lerp, ease } from './env.js';
+import { motion, mergePose } from './character.js';
+import { beachHeight } from './scenes.js';
 
 const v3 = (x, y, z) => new THREE.Vector3(x, y, z);
 const mix3 = (a, b, k) => a.clone().lerp(b, k);
-function aim(cam, pos, target, fov = 50) {
-  cam.position.copy(pos); cam.lookAt(target);
-  if (cam.fov !== fov) { cam.fov = fov; cam.updateProjectionMatrix(); }
+const wpos = (o, dy = 0) => o.getWorldPosition(new THREE.Vector3()).add(v3(0, dy, 0));
+function aim(cam, pos, target, fov = 50) { cam.position.copy(pos); cam.lookAt(target); if (cam.fov !== fov) { cam.fov = fov; cam.updateProjectionMatrix(); } }
+const yawTo = (from, to) => Math.atan2(to.x - from.x, to.z - from.z);
+const IO = ease.io;
+
+export function fadeAt(t) {
+  if (t < 0.3) return 1 - t / 0.3;
+  const dips = [[35.15, 35.4, 35.65], [42.95, 43.2, 43.45], [54.0, 54.4, 54.8]];
+  for (const [a, m, b] of dips) { if (t >= a && t <= m) return IO((t - a) / (m - a)); if (t > m && t <= b) return 1 - IO((t - m) / (b - m)); }
+  if (t > 68.9) return IO((t - 68.9) / 1.0);
+  return 0;
 }
-const merge = (...ps) => Object.assign({}, ...ps);
 
-// ---------------------------------------------------------------- shots
-export function makeShots(S, cast, gear) {
-  const { max, leo } = cast;
-  const say = (who, t) => {
-    const c = cues.subs.find((s) => s.who === who && t >= s.start + 0.05 && t <= s.end - 0.3);
-    return !!c;
-  };
-  const face = (ch, e, t) => ch.setFace(e, t, say(ch.name, t), ch.name === 'leo' ? 5 : 0);
+export function makeShots(S, cues, R) {
+  const T = cues.shots;
+  const talking = (who, t) => cues.subs.some((s) => s.who === who && t >= s.start + 0.05 && t <= s.end - 0.35);
+  const face = (ch, e, t, seed = 0) => ch.setFace(e, t, talking(ch.name, t), seed);
+  const B = S.beach.userData, SH = S.shallows.userData, C = S.city.userData;
+  const head = (ch) => ch.head;
 
+  const shot = (name, o) => ({ name, start: T[name][0], end: T[name][1], ...o });
   return [
-    // ---------------------------------------------------- 1. Beach, dawn. Low angle.
-    {
-      start: 0, end: 6.5, scene: S.beach,
-      setup() {
-        leo.root.visible = false; max.root.visible = true; gear.max.visible = false; gear.leo.visible = false;
-        S.beach.userData.splash.userData.burst({ t0: 6.05, origin: v3(1.4, 0.6, -9), n: 30, spread: 2.4, rise: 4, size: 0.25, life: 1.2 });
-      },
+    // ------------------------------------------------ 1. crowded beach, title over; camera glides to the water
+    shot('beach', {
+      scene: S.beach,
+      setup() { B.dome.material.uniforms.cTop.value.set('#2f6fc4'); B.dome.material.uniforms.cMid.value.set('#bfe3f7'); B.actors.sam.shades.visible = true; B.shades.visible = false;
+        B.splash.userData.burst({ t0: 5.32, origin: v3(6.4, 0.1, -15.5), n: 14, spread: 0.8, rise: 2.2, size: 0.14, life: 0.9 }); },
       update(lt, t, cam) {
-        // stands looking out to sea, turns to camera, nods, then runs into the water
-        let yaw = Math.PI, x = 1.4, z = 0, walk = 0;
-        const turn = ease.io(seg(lt, 2.6, 3.3)), back = ease.io(seg(lt, 4.9, 5.3));
-        yaw = lerp(Math.PI * 0.94, 0.12, turn); yaw = lerp(yaw, Math.PI * 1.02, back);
-        const run = seg(lt, 5.15, 6.5);
-        z = -ease.in(run) * 9; walk = run > 0 ? 1 : 0;
-        max.root.position.set(x, 0, z); max.root.rotation.y = yaw;
-        const nod = Math.sin(seg(lt, 3.6, 4.3) * Math.PI) * 0.22;
-        let p = merge(motion.idle(lt), { headX: nod, headY: lt < 2.6 ? Math.sin(lt * 0.7) * 0.15 : 0 });
-        if (walk) p = merge(p, motion.walk(lt, 1.25), { lean: 0.18 });
-        if (lt > 3.4 && lt < 4.9) { const k = Math.sin(seg(lt, 3.4, 4.9) * Math.PI); p.aRx = -1.25 * k; p.aRz = 0.1; } // little "let's go" gesture
-        max.pose(p);
-        face(max, lt > 3.2 ? { eyes: 'open', mouth: 'smirk', brows: 'determined' } : { eyes: 'open', mouth: 'flat' }, t);
-        const k = ease.io(seg(lt, 0, 6.5));
-        aim(cam, v3(lerp(-2.4, -1.2, k), lerp(2.2, 2.6, k), lerp(16, 13.5, k)), v3(lerp(0.4, 0.8, k), lerp(4.4, 4.2, k), lerp(0, -1.5, k)), 54);
+        const { sam, mia, kai } = B.actors;
+        sam.root.position.set(6, -3.6 + Math.sin(t * 1.3) * 0.15, -16); sam.root.rotation.y = 0.15;
+        mia.root.position.set(2.6, -3.6 + Math.sin(t * 1.3 + 1) * 0.15, -15.2); mia.root.rotation.y = 0.9;
+        kai.root.position.set(-14, -3.6, -13);
+        sam.pose(mergePose(motion.tread(t, 0.7), { headY: t < 4.6 ? -0.5 : 0, headX: t > 5.0 ? 0.35 : 0 }));
+        mia.pose(motion.tread(t, 0.7, 1));
+        face(sam, t < 5.0 ? { eyes: 'open', mouth: Math.sin(t * 2) > 0 ? 'smile' : 'talk' } : { eyes: 'wide', mouth: 'o', brows: 'up' }, t);
+        face(mia, { eyes: 'happy', mouth: 'grin' }, t, 2);
+        // sunglasses slip off and drop into the sea
+        const drop = seg(t, 5.0, 5.4);
+        sam.shades.visible = t < 5.0; B.shades.visible = t >= 5.0 && t < 5.6;
+        if (t >= 5.0) { const hp = wpos(sam.head, 0.1); B.shades.position.set(hp.x + 0.3 * drop, lerp(hp.y, -0.3, ease.in(drop)), hp.z + 0.5 + drop * 0.4); B.shades.rotation.set(drop * 4, drop * 2, 0); }
+        const k = IO(seg(lt, 2.4, 6));
+        const p = mix3(v3(-6 + lt * 0.6, 21 - lt * 0.5, 44), v3(9.5, 3.0, -6.8), k); p.y += Math.sin(k * Math.PI) * 3;
+        const g = mix3(v3(2, 1.5, -12), v3(5.6, 3.2, -16), k);
+        aim(cam, p, g, lerp(48, 52, k));
       },
-    },
-    // ---------------------------------------------------- 2. Plunge into the shallows, discovers breathing.
-    {
-      start: 6.5, end: 13, scene: S.reef,
-      setup() {
-        max.root.visible = true; leo.root.visible = false;
-        const b = S.reef.userData.bubbles.userData;
-        b.burst({ t0: 6.5, origin: v3(0, 29.5, 0), n: 60, spread: 4, rise: 2.2, size: 0.28, life: 2.6 });
-        b.burst({ t0: 7.0, origin: () => max.head.getWorldPosition(new THREE.Vector3()), n: 14, spread: 0.6, rise: 2.6, size: 0.12, life: 2.4, stagger: 0.12 });
-        b.burst({ t0: 9.15, origin: () => max.head.getWorldPosition(new THREE.Vector3()).add(v3(0.3, -0.2, 0.9)), n: 26, spread: 0.7, rise: 3.2, size: 0.2, life: 3, stagger: 0.03 });
-      },
+      speakers: () => ({}),
+    }),
+    // ------------------------------------------------ 2. underwater: he dives, picks them up, realizes he can breathe
+    shot('dive', {
+      scene: S.shallows,
+      setup() { const b = SH.bubbles.userData; const sam = SH.actors.sam;
+        b.burst({ t0: 6.05, origin: v3(1.5, 9.6, -1.5), n: 40, spread: 2.5, rise: 2.5, size: 0.2, life: 1.6 });
+        b.burst({ t0: 6.5, origin: () => wpos(sam.head, -0.1), n: 12, spread: 0.4, rise: 2.4, size: 0.1, life: 2, stagger: 0.12 });
+        b.burst({ t0: 8.55, origin: () => wpos(sam.head, -0.25).add(v3(0, 0, 0.45)), n: 26, spread: 0.5, rise: 3, size: 0.17, life: 2.6, stagger: 0.02 });
+        b.burst({ t0: 10.4, origin: () => wpos(sam.head, -0.25).add(v3(0, 0, 0.45)), n: 8, spread: 0.3, rise: 2.4, size: 0.1, life: 2, stagger: 0.05 }); },
       update(lt, t, cam) {
-        const dive = ease.out(seg(lt, 0, 1.2));
-        const y = lerp(31, 22.5, dive) - seg(lt, 1.2, 6.5) * 2.2;
-        max.root.position.set(0.3, y, 0);
-        max.root.rotation.set(lerp(-0.5, 0, dive), 0.25, 0);
-        let p;
-        if (lt < 1.1) p = { aLx: -2.9, aRx: -2.9, aLz: 0.1, aRz: 0.1, lLx: 0.1, lRx: -0.1 };
-        else if (lt < 2.7) p = merge(motion.tread(lt * 1.8, 1.4), { headY: Math.sin(lt * 3) * 0.25 });
-        else {
-          p = merge(motion.tread(lt, 0.8));
-          const look = ease.io(seg(lt, 3.3, 3.8)) * (1 - ease.io(seg(lt, 5.6, 6.1)));
-          p.aLx = lerp(p.aLx, -1.35, look); p.aRx = lerp(p.aRx, -1.35, look); p.aLz = lerp(p.aLz, -0.2, look); p.aRz = lerp(p.aRz, -0.2, look);
-          p.headX = 0.32 * look;
+        const sam = SH.actors.sam, H = SH.H, gy = H(0, 0.8);
+        SH.actors.mia.root.visible = false;
+        // glasses sink to the sand, then end up in his hand
+        const sh = SH.shadesProp;
+        if (t < 7.85) { const k = ease.out(seg(t, 6.0, 7.0)); sh.position.set(lerp(1.2, 0.35, k), lerp(9.2, gy + 0.12, k), lerp(-0.6, 1.1, k)); sh.rotation.set(lerp(1, 1.57, k), k * 3, 0); }
+        else { const hp = wpos(sam.armR.hand, -0.25); sh.position.copy(hp); sh.rotation.set(0.3, 0.3 + Math.sin(t * 2) * 0.1, 0); }
+        const dive = IO(seg(t, 6.3, 7.6));
+        const pos = mix3(v3(2.4, 5.4, -2.2), v3(0.1, gy, 0), dive);
+        sam.root.position.copy(pos);
+        if (t < 7.5) {
+          sam.root.rotation.set(dive > 0 && dive < 1 ? 0.65 * Math.sin(dive * Math.PI) : 0, lerp(-2.4, 0.3, IO(seg(t, 6.3, 7.4))), 0);
+          sam.pose(t < 6.35 ? motion.tread(t, 1.2) : mergePose(motion.swim(t), { lean: lerp(1.38, 0.4, IO(seg(t, 7.0, 7.5))) }));
+        } else {
+          sam.root.rotation.set(0, 0.3, 0);
+          const kneel = { hipY: -1.12, lLx: -0.05, lRx: 0.05, kL: 1.55, kR: 1.6, fL: -0.3, fR: -0.3, aLz: 0.15 };
+          const reach = Math.sin(seg(t, 7.5, 8.2) * Math.PI);
+          const lift = IO(seg(t, 7.9, 8.4)) * (1 - IO(seg(t, 9.3, 9.8)));
+          const look = t > 8.9 ? Math.sin((t - 8.9) * 1.8) * 0.7 * (1 - seg(t, 10.3, 10.8)) : 0;
+          sam.pose(mergePose(kneel, { torsoX: 0.5 * reach, headX: 0.35 * reach - 0.05, aRx: lerp(lerp(-0.2, -0.9, reach), -1.0, lift), eR: lerp(-0.2, -1.5, lift), aRz: 0.15, headY: look, aLx: -0.3, eL: -0.4 }));
         }
-        max.pose(p);
-        let e = { eyes: 'squeeze', mouth: 'puff' };
-        if (lt > 2.65) e = { eyes: 'wide', mouth: 'o', brows: 'up' };
-        if (lt > 3.2) e = { eyes: 'wide', mouth: 'small-o', brows: 'up' };
-        if (lt > 5.9) e = { eyes: 'happy', mouth: 'grin', brows: 'up' };
-        face(max, e, t);
-        // the "first breath" bubbles come from the mouth
-        const k = ease.io(seg(lt, 0, 6.5));
-        const focus = max.root.position.clone().add(v3(0, 3.6, 0));
-        aim(cam, v3(lerp(3.4, 2.4, k), lerp(14.5, 16.2, k), lerp(14, 11.5, k)), mix3(v3(0.3, 27, 0), focus, ease.io(seg(lt, 0.2, 1.6))), 50);
+        let e = { eyes: 'open', mouth: 'puff' };
+        if (t < 6.35) e = { eyes: 'squeeze', mouth: 'puff' };
+        if (t > 8.5) e = { eyes: 'wide', mouth: 'o', brows: 'up' };
+        if (t > 8.75) e = { eyes: 'wide', mouth: 'small-o', brows: 'up' };
+        if (t > 10.6) e = { eyes: 'wide', mouth: 'smile', brows: 'up' };
+        face(sam, e, t);
+        const k = IO(seg(lt, 0, 2.2));
+        aim(cam, mix3(v3(3.8, 3.4, 10.5), v3(3.0, 2.3, 7.8), IO(seg(lt, 0, 5))), mix3(v3(1.6, 7.6, -1.2), wpos(sam.root, 2.6).add(v3(0, 0.6, 0)), k), 52);
       },
-    },
-    // ---------------------------------------------------- 3. Sitting on the sea floor. Leo arrives.
-    {
-      start: 13, end: 21.5, scene: S.reef,
-      setup() { max.root.visible = true; leo.root.visible = true; leo.setGear(true); },
+      speakers: () => ({ sam: head(SH.actors.sam) }),
+    }),
+    // ------------------------------------------------ 3. surfacing: "Guys, you can breathe down there!"
+    shot('surface', {
+      scene: S.beach,
+      setup() { B.splash.userData.burst({ t0: 11.02, origin: v3(6, 0.2, -16), n: 26, spread: 1.4, rise: 3, size: 0.18, life: 0.9 });
+        B.splash.userData.burst({ t0: 13.75, origin: v3(2.8, 0.2, -15.4), n: 18, spread: 1.0, rise: 2.4, size: 0.15, life: 0.8 }); },
       update(lt, t, cam) {
-        const fl = S.reef.userData.floor.userData.heightAt;
-        max.root.position.set(1.4, fl(1.4, 0) + 0.05, 0); max.root.rotation.set(0, -0.3, 0);
-        let pm = motion.sitFloor(t);
-        if (lt < 1.6) { const w = Math.sin(seg(lt, 0.3, 1.6) * Math.PI); pm.aRx = lerp(pm.aRx, -2.4, w); pm.aRz = lerp(pm.aRz, 0.3, w); }
-        if (t > 18.2 && t < 20) pm = merge(pm, { headY: -0.25, headX: 0.1 });
-        max.pose(pm);
-        face(max, t > 18.1 ? { eyes: 'happy', mouth: 'smirk' } : { eyes: 'half', mouth: 'smile' }, t);
-
-        // Leo swims in from the left, then treads water staring at Max
-        const arrive = ease.out(seg(lt, 0, 2.3));
-        const lp = mix3(v3(-17, 9, -5), v3(-2.9, 3.4, -0.6), arrive);
-        lp.y += Math.sin(t * 1.3) * 0.15;
-        leo.root.position.copy(lp);
-        const settle = ease.io(seg(lt, 1.6, 2.6));
-        leo.root.rotation.set(0, lerp(Math.PI / 2, 0.55, settle), 0);
-        const sw = motion.swim(t), tr = motion.tread(t);
-        const lpz = {};
-        for (const k of new Set([...Object.keys(sw), ...Object.keys(tr)])) lpz[k] = lerp(sw[k] || 0, tr[k] || 0, settle);
-        if (t > 19.9) { lpz.headY = 0.12; }
-        if (t > 15.3 && t < 17.9) { const g = Math.sin(seg(t, 15.4, 17.6) * Math.PI); lpz.aRx = lerp(lpz.aRx, -1.4, g); lpz.aRz = lerp(lpz.aRz, -0.35, g); }
-        leo.pose(lpz);
-        let le = { eyes: 'open', mouth: 'flat' };
-        if (t > 15.2) le = { eyes: 'open', mouth: 'flat', brows: 'worried' };
-        if (t > 18.3) le = { eyes: 'half', mouth: 'flat', brows: 'flat' };
-        if (t > 20.15) le = { eyes: 'wide', mouth: 'wobble', look: 0, brows: 'up' };
-        face(leo, le, t);
-
-        // the curious fish stops right in front of Leo's goggles
-        const f = S.reef.userData.curious;
-        const head = leo.head.getWorldPosition(new THREE.Vector3());
-        const fwd = v3(Math.sin(leo.root.rotation.y), 0, Math.cos(leo.root.rotation.y));
-        const stop = head.clone().add(fwd.clone().multiplyScalar(1.5)).add(v3(0, 0.15, 0));
-        const fa = ease.out(seg(t, 19.6, 20.3));
-        const fp = mix3(stop.clone().add(v3(9, 3, 4)), stop, fa);
-        fp.y += Math.sin(t * 3) * 0.05;
-        f.position.copy(fp);
-        const toLeo = head.clone().sub(fp);
-        f.rotation.set(0, Math.atan2(-toLeo.z, toLeo.x), 0);
-        f.userData.tail.rotation.y = Math.sin(t * (fa < 1 ? 14 : 5)) * 0.45;
-        f.visible = t > 19.4;
-
-        const k = ease.io(seg(lt, 0, 8.5));
-        aim(cam, v3(lerp(1.4, 0.8, k), lerp(5.6, 5.2, k), lerp(20, 17.5, k)), v3(-0.6, lerp(3.2, 3.4, k), 0), 50);
+        const { sam, mia, kai } = B.actors; sam.shades.visible = false; B.shades.visible = false;
+        const up = ease.out(seg(t, 11.0, 11.45));
+        sam.root.position.set(6, lerp(-7, -3.5, up) + Math.sin(t * 1.4) * 0.12, -16); sam.root.rotation.y = -0.45;
+        const point = Math.sin(seg(t, 12.0, 13.6) * Math.PI);
+        sam.pose(mergePose(motion.tread(t, 1.2), { aRx: lerp(-0.35, -2.2, point), eR: lerp(-0.4, -0.1, point), aRz: 0.2, headY: -0.25 }));
+        face(sam, { eyes: 'wide', mouth: 'grin', brows: 'up' }, t);
+        const duck = IO(seg(t, 13.55, 14.0));
+        mia.root.position.set(2.6, -3.6 + Math.sin(t * 1.3 + 1) * 0.12 - duck * 5, -15.2); mia.root.rotation.y = 0.5;
+        mia.pose(motion.tread(t, 0.8, 1));
+        face(mia, t < 12.6 ? { eyes: 'open', mouth: 'flat', brows: 'worried' } : { eyes: 'half', mouth: 'smirk', brows: 'flat' }, t, 2);
+        kai.root.position.set(8.8, -3.6 + Math.sin(t * 1.2) * 0.12, -19.5); kai.root.rotation.y = -0.6; kai.pose(motion.tread(t, 0.8, 2));
+        face(kai, { eyes: 'open', mouth: 'small-o', brows: 'up' }, t, 4);
+        aim(cam, v3(lerp(3.6, 3.9, lt / 3.2), 1.0, -6.2), v3(4.6, 1.6, -16.2), 58);
       },
-    },
-    // ---------------------------------------------------- 4. The deep: flashlights, jellyfish, darkness.
-    {
-      start: 21.5, end: 29, scene: S.deep,
-      setup() {
-        max.root.visible = true; leo.root.visible = true; leo.setGear(true); gear.max.visible = true; gear.leo.visible = true;
-        const b = S.deep.userData.bubbles.userData;
-        b.burst({ t0: 25.95, origin: () => leo.head.getWorldPosition(new THREE.Vector3()).add(v3(0.8, 1.4, 0.2)), n: 6, spread: 0.2, rise: 1.8, size: 0.14, life: 2.2, stagger: 0.15 });
-      },
+      speakers: () => ({ sam: head(B.actors.sam) }),
+    }),
+    // ------------------------------------------------ 4. underwater again: Mia tries it; others follow
+    shot('spread', {
+      scene: S.shallows,
+      setup() { const b = SH.bubbles.userData, mia = SH.actors.mia; SH.actors.mia.root.visible = true; SH.shadesProp.visible = false;
+        b.burst({ t0: 14.25, origin: v3(-1.5, 9.6, 0.4), n: 30, spread: 1.6, rise: 2.4, size: 0.16, life: 1.4 });
+        b.burst({ t0: 14.75, origin: () => wpos(mia.head, -0.2).add(v3(0, 0, 0.4)), n: 22, spread: 0.4, rise: 3, size: 0.15, life: 2.4, stagger: 0.02 }); },
       update(lt, t, cam) {
-        max.root.position.set(2.0, Math.sin(t * 1.1) * 0.25, 0); max.root.rotation.set(0, -0.25, 0);
-        leo.root.position.set(-2.1, 0.3 + Math.sin(t * 1.1 + 1.4) * 0.25, 0.6); leo.root.rotation.set(0, 0.35, 0);
-        const sweep = Math.sin(t * 0.7) * 0.25;
-        max.pose(merge(motion.tread(t, 0.6), { aRx: -1.35 + sweep * 0.4, aRy: sweep, aRz: -0.05, headY: sweep * 0.5 + (t > 26 ? -0.45 : 0) }));
-        const panic = t > 25.4 && t < 26.1 ? Math.sin(t * 40) * 0.08 : 0;
-        leo.pose(merge(motion.tread(t + 1, 0.9), { aLx: -1.25 - sweep * 0.3, aLy: -sweep, aLz: -0.05, headZ: panic, headY: t > 23 && t < 26 ? 0.1 : 0.35 }));
-        face(max, t > 26.1 ? { eyes: 'half', mouth: 'smirk' } : { eyes: 'open', mouth: 'flat' }, t);
-        face(leo, t < 23.3 ? { eyes: 'wide', mouth: 'small-o', brows: 'worried' } : t < 26.2 ? { eyes: 'open', mouth: 'wobble', brows: 'worried' } : { eyes: 'half', mouth: 'flat', brows: 'flat' }, t);
-        const k = ease.io(seg(lt, 0, 7.5));
-        aim(cam, v3(lerp(0.8, 0.2, k), lerp(-5.5, -3.8, k), lerp(17.5, 14.5, k)), v3(0, lerp(3.4, 3.6, k), 0), 52);
+        const { sam, mia } = SH.actors;
+        const d = ease.out(seg(t, 14.2, 15.0));
+        mia.root.position.set(-1.6, lerp(6.4, 2.6, d) + Math.sin(t * 1.2) * 0.12, 0.6); mia.root.rotation.set(0, 0.45, 0);
+        mia.pose(mergePose(motion.tread(t, 1, 1), t > 15.6 ? { aLz: 1.3, aRz: 1.3, eL: -0.3, eR: -0.3 } : {}));
+        face(mia, t < 14.7 ? { eyes: 'squeeze', mouth: 'puff' } : t < 15.0 ? { eyes: 'wide', mouth: 'o', brows: 'up' } : { eyes: 'happy', mouth: 'grin', brows: 'up' }, t, 2);
+        sam.root.position.set(1.6, 2.4 + Math.sin(t * 1.2 + 2) * 0.12, -0.6); sam.root.rotation.set(0, -0.55, 0);
+        sam.pose(mergePose(motion.tread(t, 0.8), { aRx: -2.6, eR: -0.2, aRz: 0.3 }));
+        face(sam, { eyes: 'happy', mouth: 'grin' }, t);
+        aim(cam, mix3(v3(0.4, 3.2, 11.5), v3(0.2, 3.4, 9.6), IO(seg(lt, 0, 2.8))), v3(0, 4.6, 0), 56);
       },
-    },
-    // ---------------------------------------------------- 5a. Establishing: the city, 25 years later.
-    {
-      start: 29, end: 34.6, scene: S.city,
-      setup() { max.root.visible = true; leo.root.visible = true; leo.setGear(true); gear.max.visible = false; gear.leo.visible = false; },
+      speakers: () => ({ mia: head(SH.actors.mia) }),
+    }),
+    // ------------------------------------------------ 5. lifeguard vs. swimmers
+    shot('guard', {
+      scene: S.beach,
+      setup() { B.splash.userData.burst({ t0: 18.85, origin: v3(-6, 0.2, -13), n: 24, spread: 1.4, rise: 3, size: 0.18, life: 0.9 }); },
       update(lt, t, cam) {
-        const k = ease.io(seg(lt, 0, 5.6));
-        // Max & Leo swim across the foreground, side by side
-        const sx = lerp(-26, 18, seg(lt, 0, 5.6));
-        for (const [ch, dz, dy, ph] of [[max, 0, 0, 0], [leo, -2.8, 1.2, 1.3]]) {
-          ch.root.position.set(sx + (ch === leo ? -2.2 : 0), 47 + dy + Math.sin(t * 1.2 + ph) * 0.4, 58 + dz);
-          ch.root.rotation.set(0, Math.PI / 2, 0);
-          ch.pose(motion.swim(t + ph));
-          face(ch, { eyes: 'happy', mouth: 'smile' }, t);
+        const { guard, kai, sam, mia } = B.actors;
+        sam.root.position.y = -9; mia.root.position.y = -9;
+        guard.root.rotation.y = Math.PI - 0.75;
+        const shout = t < 20.3 ? IO(seg(t, 17.05, 17.4)) : 1 - IO(seg(t, 20.3, 20.7));
+        guard.pose(mergePose(motion.idle(t), { aRx: -1.45 * shout, eR: -1.25 * shout, aRz: 0.1, aLx: -0.4 * shout, aLz: 0.5 * shout, eL: -0.2, torsoX: 0.08 * shout }));
+        face(guard, t < 19.6 ? { eyes: 'open', mouth: 'shout', brows: 'angry' } : t < 20.3 ? { eyes: 'open', mouth: 'flat', brows: 'angry' } : { eyes: 'wide', mouth: 'o', brows: 'up' }, t);
+        const pop = ease.out(seg(t, 18.85, 19.2));
+        kai.root.position.set(-6, lerp(-7.5, -3.3, pop) + Math.sin(t * 1.5) * 0.1, -13); kai.root.rotation.y = 0.55;
+        kai.pose(mergePose(motion.tread(t, 1.2, 2), { aLx: -2.9, aRx: -2.9, aLz: 0.35, aRz: 0.35, eL: -0.1, eR: -0.1 }));
+        face(kai, { eyes: 'happy', mouth: 'shout' }, t, 4);
+        for (const s of B.swimmers) s.react = t > 19.2 ? (tt) => ({ eyes: 'happy', mouth: 'grin' }) : null;
+        if (t < 18.95) aim(cam, v3(-0.5, 3.0, 16.5), v3(-9.2, 9.6, 7.6), 46);
+        else if (t < 20.35) aim(cam, v3(-3.0, 1.1, -5.4), v3(-6.3, 2.3, -13), 54);
+        else aim(cam, v3(-4.2, 9.6, 14.2), v3(-9.6, 10.6, 8.4), 40);
+      },
+      speakers: () => ({ guard: head(B.actors.guard), swimmer: head(B.actors.kai) }),
+    }),
+    // ------------------------------------------------ 6. news studio
+    shot('studio', {
+      scene: S.studio, news: true,
+      prerender(r, t) { r.renderWall(t); },
+      update(lt, t, cam) {
+        const a = S.studio.userData.actors.anchor;
+        a.pose(mergePose(motion.sitChair(t), { aLx: -0.75, aRx: -0.75, eL: -0.95, eR: -0.95 + Math.sin(t * 2.2) * 0.12 * (talking('anchor', t) ? 1 : 0), aLz: 0.18, aRz: 0.18, headX: Math.sin(t * 2.4) * 0.03, headY: Math.sin(t * 0.7) * 0.05 }));
+        face(a, { eyes: 'open', mouth: 'flat', brows: 'soft' }, t);
+        const k = IO(seg(lt, 0, 5.4));
+        aim(cam, v3(lerp(1.2, 0.5, k), lerp(4.6, 4.4, k), lerp(10.5, 8.6, k)), v3(0, lerp(5.3, 5.1, k), -2), 50);
+      },
+      speakers: () => ({ anchor: head(S.studio.userData.actors.anchor) }),
+    }),
+    // ------------------------------------------------ 7. news cut: another beach (Sydney), warm afternoon
+    shot('cutA', {
+      scene: S.beach, news: true,
+      setup() { B.dome.material.uniforms.cTop.value.set('#3f6fb0'); B.dome.material.uniforms.cMid.value.set('#f7c99a'); },
+      update(lt, t, cam) { B.actors.sam.root.position.y = -9; aim(cam, v3(36 - lt * 3, 15, 18), v3(4, 0, -14), 55); },
+      speakers: () => ({}),
+    }),
+    // ------------------------------------------------ 8. news cut: public pool (Tokyo)
+    shot('cutB', {
+      scene: S.pool, news: true,
+      update(lt, t, cam) { aim(cam, v3(2 + lt, 6.5, -6), v3(0, 2.2, -26), 56); },
+      speakers: () => ({}),
+    }),
+    // ------------------------------------------------ 9. field reporter; a man walks out of the sea with a lawn chair
+    shot('reporter', {
+      scene: S.beach, news: true,
+      setup() { B.dome.material.uniforms.cTop.value.set('#2f6fc4'); B.dome.material.uniforms.cMid.value.set('#bfe3f7'); },
+      update(lt, t, cam) {
+        const { reporter, chairguy } = B.actors;
+        for (const p of B.crowd) if (p.kind === 'walk') p.c.root.visible = Math.abs(p.c.root.position.x + 25) > 9;
+        reporter.pose(mergePose(motion.idle(t), { aRx: -1.25, eR: -1.55, aRz: 0.05, aLx: -0.3 + Math.sin(t * 1.6) * 0.15 * (talking('reporter', t) ? 1 : 0), eL: -0.6 }));
+        face(reporter, { eyes: 'open', mouth: 'flat', brows: 'soft' }, t, 3);
+        const w = seg(t, 28.2, 35.4);
+        const x = lerp(-21.5, -22.8, w), z = lerp(-31, -8.5, w);
+        chairguy.root.position.set(x, beachHeight(x, z), z); chairguy.root.rotation.y = 0.05;
+        chairguy.pose(mergePose(motion.walk(t, 0.85), { aRx: -0.15, aRz: 0.3, eR: -0.1 }));
+        face(chairguy, { eyes: 'open', mouth: 'smile' }, t, 5);
+        const k = IO(seg(lt, 0, 7.2));
+        aim(cam, v3(lerp(-25.6, -25.2, k), 4.7, lerp(10.5, 9.0, k)), v3(-24.8, 4.3, -6), 50);
+      },
+      speakers: () => ({ reporter: head(B.actors.reporter) }),
+    }),
+    // ------------------------------------------------ 10. the lab
+    shot('lab', {
+      scene: S.lab,
+      update(lt, t, cam) {
+        const { sci1, sci2, vol } = S.lab.userData.actors;
+        const turn = IO(seg(t, 38.0, 38.5));
+        sci1.root.rotation.y = lerp(yawTo(sci1.root.position, v3(-2, 0, -5)), yawTo(sci1.root.position, sci2.root.position), turn);
+        sci2.root.rotation.y = lerp(yawTo(sci2.root.position, v3(6.0, 0, -1.4)), yawTo(sci2.root.position, sci1.root.position) + 0.4, turn);
+        const shrug = Math.sin(seg(t, 40.3, 41.6) * Math.PI);
+        sci1.pose(mergePose(motion.idle(t), { aLx: -0.9, eL: -1.2, aRz: 0.1 + shrug * 0.7, eR: -shrug * 1.4, aRx: -shrug * 0.4, headZ: shrug * 0.15, headY: t > 38.2 && t < 40.2 ? 0.4 : 0 }));
+        sci2.pose(mergePose(motion.idle(t, 1, 2), { torsoX: t < 38.2 ? 0.25 : 0, aRx: -1.6, eR: -2.0, aRz: -0.1, aLx: -0.2, eL: -1.1, aLz: 0.3 }));
+        face(sci1, t < 40.0 ? { eyes: 'open', mouth: 'flat', brows: 'up' } : { eyes: 'half', mouth: 'smirk', brows: 'flat' }, t);
+        face(sci2, t < 38.2 ? { eyes: 'wide', mouth: 'small-o', brows: 'up' } : { eyes: 'open', mouth: 'frown', brows: 'worried' }, t, 2);
+        if (t < 38.2) aim(cam, mix3(v3(13.5, 7.6, 14), v3(11.5, 7.0, 12), IO(seg(lt, 0, 2.8))), v3(1.4, 5.6, -2.4), 50);
+        else aim(cam, mix3(v3(9.6, 5.6, 11.0), v3(8.8, 5.4, 9.4), IO(seg(t, 38.2, 43.2))), v3(4.4, 4.7, 2.2), 54);
+      },
+      speakers: () => ({ sci1: head(S.lab.userData.actors.sci1), sci2: head(S.lab.userData.actors.sci2) }),
+    }),
+    // ------------------------------------------------ 11. montage A: lawn chair at the bottom of the pool
+    shot('chair', {
+      scene: S.pool,
+      setup() { const ray = S.pool.userData.actors.ray; S.pool.userData.bubbles.userData.burst({ t0: 44.6, origin: () => wpos(ray.armL.hand, 0.2), n: 8, spread: 0.15, rise: 2, size: 0.09, life: 2, stagger: 0.1 }); },
+      update(lt, t, cam) {
+        const ray = S.pool.userData.actors.ray; face(ray, t > 44.3 && t < 45 ? { eyes: 'closed', mouth: 'small-o' } : { eyes: 'closed', mouth: 'smile' }, t);
+        aim(cam, mix3(v3(5.2, 2.2, 11.5), v3(4.2, 2.5, 9.6), IO(seg(lt, 0, 2.6))), v3(0.1, 2.8, 3.8), 50);
+      },
+      speakers: () => ({}),
+    }),
+    // ------------------------------------------------ 12. montage B: swimming to school
+    shot('school', {
+      scene: S.shallows,
+      update(lt, t, cam) {
+        let lead = 0;
+        SH.students.forEach((s, i) => {
+          const x = 38 + (lt - s.lag * 0.5) * 6.2; if (i === 0) lead = x;
+          s.c.root.position.set(x, s.y + Math.sin(t * 1.4 + s.ph) * 0.2, s.z); s.c.root.rotation.set(0, Math.PI / 2, 0);
+          s.c.pose(motion.swim(t, 1, s.ph)); s.c.setFace({ eyes: 'open', mouth: i === 1 ? 'grin' : 'smile' }, t, false, s.ph);
+        });
+        aim(cam, v3(lead - 6, 4.6, 13), v3(lead - 2, 5.0, -2), 52);
+      },
+      speakers: () => ({}),
+    }),
+    // ------------------------------------------------ 13. montage C: the sandwich
+    shot('sandwich', {
+      scene: S.shallows,
+      update(lt, t, cam) {
+        const dan = SH.actors.dan, sw = SH.sandwich, parts = sw.userData.parts;
+        dan.root.position.set(-60, SH.H(-60, 0.9) + 0.25, 0.9); dan.root.rotation.y = 0.15;
+        const lift = IO(seg(t, 48.4, 48.9)), drop = IO(seg(t, 50.9, 51.5));
+        dan.pose(mergePose(motion.sitChair(t), { aRx: lerp(-0.5, -1.1, lift) + drop * 0.5, eR: lerp(-0.9, -1.5, lift) + drop * 0.6, aLx: -0.4, eL: -0.6, headX: 0.12 }));
+        face(dan, t < 49.2 ? { eyes: 'happy', mouth: 'grin' } : t < 49.7 ? { eyes: 'wide', mouth: 'o', brows: 'up' } : { eyes: 'half', mouth: 'flat', brows: 'flat' }, t);
+        sw.position.copy(wpos(dan.armR.hand, -0.2)).add(v3(0, 0, 0.25)); sw.rotation.set(0, 0.15, 0);
+        const fl = Math.max(0, t - 49.05);
+        const drift = { top: v3(0.25, 1.0, 0.2), lettuce: v3(-0.6, 0.55, 0.3), tomato: v3(-0.5, 0.75, 0.6), tomato2: v3(0.7, 0.65, 0.35), cheese: v3(0.5, 0.45, -0.3), ham: v3(-0.2, 0.8, -0.6) };
+        for (const k in parts) {
+          const p = parts[k]; p.position.copy(p.userData.home);
+          if (drift[k]) { p.position.addScaledVector(drift[k], fl * 0.75); p.rotation.set(fl * 0.8 * drift[k].x, fl * 0.5, fl * 0.7 * drift[k].z); }
+          else { p.scale.set(1, 1 - Math.min(0.45, fl * 0.3), 1); p.material.color.set(fl > 0.3 ? '#c49a5c' : '#e6b872'); }
         }
-        aim(cam, v3(lerp(-14, 4, k), lerp(64, 47, k), lerp(102, 82, k)), v3(lerp(-4, 8, k), lerp(26, 22, k), lerp(-10, 6, k)), 55);
+        aim(cam, mix3(v3(-57.4, 3.9, 8.6), v3(-58.2, 4.0, 7.2), IO(seg(lt, 0, 3.4))), v3(-60.2, 4.2, 0.6), 50);
       },
-    },
-    // ---------------------------------------------------- 5b. Rooftop terrace. Leo still wears the snorkel.
-    {
-      start: 34.6, end: 41.6, scene: S.city,
-      setup() {
-        max.root.visible = true; leo.root.visible = true; leo.setGear(true);
-        const b = S.city.userData.bubbles.userData;
-        b.burst({ t0: 40.75, origin: () => max.head.getWorldPosition(new THREE.Vector3()).add(v3(0, 0.8, 0)), n: 12, spread: 0.8, rise: 2.4, size: 0.13, life: 2.2, stagger: 0.02 });
-        b.burst({ t0: 39.3, origin: () => leo.head.getWorldPosition(new THREE.Vector3()).add(v3(0.8, 1.45, 0.2)), n: 8, spread: 0.15, rise: 2.2, size: 0.12, life: 2.2, stagger: 0.12 });
-      },
+      speakers: () => ({ dan: head(SH.actors.dan) }),
+    }),
+    // ------------------------------------------------ 14. montage D: the touchscreen doesn't respond
+    shot('phone', {
+      scene: S.shallows,
       update(lt, t, cam) {
-        const R = S.city.userData.roof;
-        max.root.position.set(R.x - 3.2, R.y + 0.1, R.z + 0.4); max.root.rotation.set(0, 0.32, 0);
-        leo.root.position.set(R.x + 3.2, R.y + 0.1, R.z + 0.4); leo.root.rotation.set(0, -0.32, 0);
-        const sm = motion.sitChair(t);
-        const bonk = seg(t, 40.7, 41.5);
-        const jerk = bonk > 0 ? Math.sin(Math.min(1, bonk * 3) * Math.PI) : 0;
-        max.pose(merge(sm, { headY: t > 37.9 && t < 40.6 ? -0.35 : -0.15, headZ: jerk * 0.3, headX: jerk * 0.2, aRx: t > 35.3 && t < 37.9 ? -1.3 : sm.aRx, aRz: t > 35.3 && t < 37.9 ? -0.35 : 0.08 }));
-        // Leo proudly adjusts his snorkel, then sips his drink through it
-        const adj = Math.sin(seg(t, 38.3, 39.6) * Math.PI);
-        leo.pose(merge(sm, { headY: t < 38.1 ? 0.35 : 0.05, headX: -0.08 * adj, aRx: -2.5 * adj + sm.aRx * (1 - adj), aRz: 0.15 * adj }));
-        face(max, bonk > 0 ? { eyes: 'squeeze', mouth: 'wobble' } : t > 37.9 ? { eyes: 'half', mouth: 'flat', brows: 'flat' } : { eyes: 'open', mouth: 'smile', brows: 'up' }, t);
-        face(leo, bonk > 0.15 ? { eyes: 'happy', mouth: 'grin' } : t > 38.1 ? { eyes: 'happy', mouth: 'smirk' } : { eyes: 'open', mouth: 'smile' }, t);
-
-        // a fish swims straight into Max's head
-        const f = S.city.userData.bonkFish;
-        const hp = max.head.getWorldPosition(new THREE.Vector3());
-        const fa = seg(t, 39.9, 40.72);
-        const fp = mix3(hp.clone().add(v3(-2.5, 7, 4)), hp.clone().add(v3(-0.4, 0.5, 0.7)), fa);
-        if (t > 40.72) fp.add(v3(ease.out(seg(t, 40.72, 41.6)) * 1.5, ease.out(seg(t, 40.72, 41.6)) * 2.5, 0.5));
-        f.position.copy(fp);
-        f.rotation.set(t > 40.72 ? seg(t, 40.72, 41.6) * 6 : 0, t > 40.72 ? Math.PI : -0.9, t > 40.72 ? 0 : -0.9);
-        f.userData.tail.rotation.y = Math.sin(t * 16) * 0.5;
-        f.visible = t > 39.8;
-
-        const k = ease.io(seg(lt, 0, 7));
-        aim(cam, v3(R.x + lerp(1.0, 0.4, k), R.y + lerp(4.6, 4.4, k), R.z + lerp(21, 18.5, k)), v3(R.x + lerp(0.2, 0, k), R.y + 4.0, R.z), 48);
+        const ava = SH.actors.ava;
+        ava.root.position.set(0, 2.6 + Math.sin(t * 1.1) * 0.12, -60); ava.root.rotation.y = 0.1;
+        const tap = t < 53.3 ? Math.max(0, Math.sin(t * 13)) : 0, shake = t > 53.3 && t < 53.9 ? Math.sin(t * 40) * 0.25 : 0;
+        ava.pose(mergePose(motion.tread(t, 0.5), { aRx: -1.25 + shake, eR: -1.25, aRz: -0.15, aLx: -1.0, eL: -1.3 + tap * 0.25, aLz: -0.25, headX: 0.32 }));
+        face(ava, t < 52.5 ? { eyes: 'open', mouth: 'flat' } : t < 53.3 ? { eyes: 'open', mouth: 'frown', brows: 'angry' } : { eyes: 'squeeze', mouth: 'wobble', brows: 'angry' }, t, 6);
+        aim(cam, mix3(v3(1.8, 8.4, -53.6), v3(1.3, 8.1, -55.0), IO(seg(lt, 0, 2.6))), v3(0, 7.2, -60), 46);
       },
-    },
-    // ---------------------------------------------------- 6. Final: looking up at the light. Title returns.
-    {
-      start: 41.6, end: 47.5, scene: S.city,
-      setup() { max.root.visible = true; leo.root.visible = true; leo.setGear(true); S.city.userData.bonkFish.visible = false; },
+      speakers: () => ({}),
+    }),
+    // ------------------------------------------------ 15. YEAR 15: the settlement
+    shot('city', {
+      scene: S.city,
       update(lt, t, cam) {
-        const R = S.city.userData.roof;
-        max.root.position.set(R.x - 6.2, R.y, R.z - 7.0); max.root.rotation.set(0, Math.PI - 0.12, 0);
-        leo.root.position.set(R.x - 3.0, R.y, R.z - 6.8); leo.root.rotation.set(0, Math.PI + 0.15, 0);
-        const point = ease.io(seg(lt, 1.0, 1.8)) * (1 - ease.io(seg(lt, 3.6, 4.4)));
-        max.pose(merge(motion.idle(t), { headX: -0.45, headY: -0.15, aRx: -2.7 * point, aRz: 0.15 * point }));
-        leo.pose(merge(motion.idle(t + 1), { headX: -0.4, headY: 0.2 }));
-        face(max, { eyes: 'open', mouth: 'smile' }, t); face(leo, { eyes: 'open', mouth: 'smile' }, t);
-        const k = ease.io(seg(lt, 0, 5.4));
-        aim(cam, v3(R.x - 4.6, R.y + lerp(0.6, 1.0, k), R.z - lerp(22, 19, k)), v3(R.x - 4.6, R.y + lerp(6.6, 6.0, k), R.z - 7), 56);
+        const k = IO(seg(lt, 0, 3.0));
+        aim(cam, mix3(v3(-34, 74, 150), v3(-12, 54, 126), k), mix3(v3(0, 26, 0), v3(6, 20, -6), k), 56);
       },
-    },
+      speakers: () => ({}),
+    }),
+    // ------------------------------------------------ 16. a living room watching the opening on TV
+    shot('tv', {
+      scene: S.apartment,
+      prerender(r, t) { r.renderTV(t); },
+      update(lt, t, cam) {
+        const a = S.studio.userData.actors.anchor;
+        a.pose(mergePose(motion.sitChair(t), { aLx: -0.75, aRx: -0.75, eL: -0.95, eR: -0.95, aLz: 0.18, aRz: 0.18 }));
+        face(a, { eyes: 'open', mouth: 'smile', brows: 'soft' }, t);
+        aim(cam, mix3(v3(1.6, 7.2, 17.5), v3(1.3, 6.8, 15.0), IO(seg(lt, 0, 5))), v3(1.0, 5.4, -5), 60);
+      },
+      speakers: () => ({ anchor: S.apartment.userData.tvScreen }),
+    }),
+    // ------------------------------------------------ 17. "You can't park there!"
+    shot('parking', {
+      scene: S.city,
+      setup() { C.bubbles.userData.burst({ t0: 66.5, origin: () => wpos(C.actors.luis.head, 0.2), n: 6, spread: 0.2, rise: 1.6, size: 0.1, life: 1.8, stagger: 0.15 }); },
+      update(lt, t, cam) {
+        const { owen, luis } = C.actors, NZ = C.NZ, hy = C.hy, door = C.house.userData.door;
+        door.position.x = lerp(-2.5, -5.1, IO(seg(t, 63.6, 64.0)));
+        const out = IO(seg(t, 63.75, 64.4));
+        if (t < 63.75) { owen.root.position.set(2.7, hy - 0.75, NZ + 3.4); owen.root.rotation.y = 0; }
+        else { owen.root.position.copy(mix3(v3(-2.4, hy + 0.2, NZ + 3.8), v3(2.6, hy + 0.6, NZ + 6.6), out)); owen.root.rotation.y = lerp(0, 0.45, out); }
+        const pointK = Math.sin(seg(t, 64.4, 66.2) * Math.PI);
+        const look = seg(t, 67.4, 68.6);
+        owen.pose(mergePose(t < 63.75 ? motion.idle(t) : motion.tread(t, 0.4), { aRx: lerp(-0.35, -1.55, pointK), eR: lerp(-0.4, -0.05, pointK), aRy: -0.6 * pointK, aRz: 0.1, headY: look > 0 ? Math.sin(look * Math.PI * 2) * 0.8 : (t < 63.75 ? -0.35 : 0.2) }));
+        face(owen, t < 63.0 ? { eyes: 'open', mouth: 'flat' } : t < 66.9 ? { eyes: 'open', mouth: 'frown', brows: 'angry' } : { eyes: 'half', mouth: 'flat', brows: 'flat' }, t);
+        luis.root.position.copy(mix3(v3(-5.5, hy + 0.3, NZ + 10.6), v3(1.4, hy + 0.3, NZ + 11.4), IO(seg(t, 63.4, 64.3)))); luis.root.position.y += Math.sin(t * 1.2) * 0.1; luis.root.rotation.y = yawTo(luis.root.position, owen.root.position);
+        const wide = Math.sin(seg(t, 66.4, 68.3) * Math.PI);
+        luis.pose(mergePose(motion.tread(t, 0.4, 1), { aLz: 0.4 + wide * 0.9, aRz: 0.4 + wide * 0.9, eL: -0.4, eR: -0.4, aLx: -0.4 * wide, aRx: -0.4 * wide }));
+        face(luis, t < 66.3 ? { eyes: 'open', mouth: 'smile' } : { eyes: 'half', mouth: 'smirk', brows: 'up' }, t, 3);
+        if (t < 63.7) aim(cam, mix3(v3(3.6, hy + 4.6, NZ + 15), v3(3.2, hy + 4.5, NZ + 12.5), IO(seg(lt, 0, 1.3))), v3(1.2, hy + 4.0, NZ + 5), 50);
+        else if (t < 66.8) aim(cam, v3(11.5, hy + 4.4, NZ + 15.5), v3(1.8, hy + 3.6, NZ + 8.6), 52);
+        else { const k = IO(seg(t, 66.8, 70)); aim(cam, mix3(v3(11.5, hy + 4.4, NZ + 15.5), v3(26, hy + 34, NZ + 64), k), mix3(v3(1.8, hy + 3.6, NZ + 8.6), v3(0, hy + 2, NZ + 4), k), lerp(52, 56, k)); }
+      },
+      speakers: () => ({ nb1: head(C.actors.owen), nb2: head(C.actors.luis) }),
+    }),
   ];
 }

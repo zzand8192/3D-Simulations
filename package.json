@@ -2,12 +2,12 @@
   "name": "what-if-underwater",
   "version": "1.0.0",
   "private": true,
-  "description": "Cinematic 9:16 3D short: What if humans could breathe underwater?",
+  "description": "Cinematic 9:16 3D short: What if every human could breathe underwater?",
   "type": "module",
   "scripts": {
     "preview": "npx --yes http-server src -p 8080 -c-1",
-    "render": "node scripts/render.mjs",
-    "stills": "node scripts/render.mjs --stills 2.5,9,15,19,24,31,36,40.8,44"
+    "render": "node scripts/render.mjs --workers 3",
+    "stills": "node scripts/render.mjs --stills 2,9.5,12.5,19.6,24,30,39.5,44.5,50.3,53,59,65"
   },
   "license": "MIT"
 }
