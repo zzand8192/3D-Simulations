@@ -77,26 +77,36 @@ export function palm(r, h = 9) {
   return g;
 }
 const FACADES = ['#f1d9a8', '#f3b27a', '#e9e2cf', '#d98c5f', '#f6e7b0', '#cfd8d6', '#e8a07a'];
-export function building(r, w, h, d, color) {
-  color = color || FACADES[Math.floor(r() * FACADES.length)];
-  const floors = Math.max(2, Math.round(h / 3.4)), cols = Math.max(2, Math.round(w / 2.6));
-  const tex = canvasTex(256, 512, (g, W, H) => {
+// facade textures + materials are shared between buildings with the same colour / window grid (memory!)
+const FACADE_CACHE = new Map();
+function facadeMats(color, cols, floors) {
+  const key = `${color}|${cols}|${floors}`;
+  if (FACADE_CACHE.has(key)) return FACADE_CACHE.get(key);
+  let seed = 7; for (const ch of key) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0; const rr = rng(seed);
+  const tex = canvasTex(128, 256, (g, W, H) => {
     g.fillStyle = color; g.fillRect(0, 0, W, H);
     const fw = W / cols, fh = H / floors;
     for (let y = 0; y < floors; y++) for (let x = 0; x < cols; x++) {
       const px = x * fw + fw * 0.2, py = y * fh + fh * 0.22, ww = fw * 0.6, hh = fh * 0.56;
-      g.fillStyle = '#f7f4ec'; g.fillRect(px - 3, py - 3, ww + 6, hh + 6);
-      g.fillStyle = r() < 0.7 ? '#3f5466' : '#5b7286'; g.fillRect(px, py, ww, hh);
-      g.fillStyle = '#f7f4ec'; g.fillRect(px + ww / 2 - 1.5, py, 3, hh); g.fillRect(px, py + hh * 0.4, ww, 3);
-      if (r() < 0.35) { g.fillStyle = 'rgba(40,30,30,.55)'; g.fillRect(px - 4, py + hh + 2, ww + 8, 5); }
+      g.fillStyle = '#f7f4ec'; g.fillRect(px - 1.5, py - 1.5, ww + 3, hh + 3);
+      g.fillStyle = rr() < 0.7 ? '#3f5466' : '#5b7286'; g.fillRect(px, py, ww, hh);
+      g.fillStyle = '#f7f4ec'; g.fillRect(px + ww / 2 - 0.75, py, 1.5, hh); g.fillRect(px, py + hh * 0.4, ww, 1.5);
+      if (rr() < 0.35) { g.fillStyle = 'rgba(40,30,30,.55)'; g.fillRect(px - 2, py + hh + 1, ww + 4, 2.5); }
     }
     g.fillStyle = 'rgba(0,0,0,.12)'; g.fillRect(0, H - fh * 0.9, W, fh * 0.9);
   });
+  const side = M('#ffffff', { map: tex }), plain = M(color);
+  const v = { mats: [side, side, plain, plain, side, side], roof: M('#e8e1d3'), cap: M('#d8d1c3') };
+  FACADE_CACHE.set(key, v); return v;
+}
+export function building(r, w, h, d, color) {
+  color = color || FACADES[Math.floor(r() * FACADES.length)];
+  const floors = Math.max(2, Math.round(h / 3.4 / 4) * 4), cols = Math.max(2, Math.round(w / 2.6 / 2) * 2);
+  const F = facadeMats(color, cols, floors);
   const g = new THREE.Group();
-  const mats = [M('#ffffff', { map: tex }), M('#ffffff', { map: tex }), M(color), M(color), M('#ffffff', { map: tex }), M('#ffffff', { map: tex })];
-  const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mats); b.position.y = h / 2; b.castShadow = b.receiveShadow = true; g.add(b);
-  g.add(at(box(w + 0.4, 0.5, d + 0.4, M('#e8e1d3')), 0, h + 0.25, 0));
-  if (r() < 0.5) g.add(at(box(w * 0.3, 1.6, d * 0.3, M('#d8d1c3')), (r() - 0.5) * w * 0.4, h + 1.2, 0));
+  const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), F.mats); b.position.y = h / 2; b.castShadow = b.receiveShadow = true; g.add(b);
+  g.add(at(box(w + 0.4, 0.5, d + 0.4, F.roof), 0, h + 0.25, 0));
+  if (r() < 0.5) g.add(at(box(w * 0.3, 1.6, d * 0.3, F.cap), (r() - 0.5) * w * 0.4, h + 1.2, 0));
   return g;
 }
 export function seagull() {

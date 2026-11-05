@@ -51,7 +51,7 @@ export function buildCity(renderer, opts = {}) {
   scene.add(dome);
   scene.environment = envFrom(renderer, gradientDome({ top: st.sky[0], mid: st.sky[1], bottom: '#8e8a80', sunDir: st.sunDir })); scene.environmentIntensity = 0.7;
   scene.fog = new THREE.Fog(st.sky[1], 160, 700);
-  const key = sun(scene, '#fff2dc', 2.9, st.sunDir, v3(0, 0, 0), 120, 4096);
+  const key = sun(scene, '#fff2dc', 2.9, st.sunDir, v3(0, 0, 0), 120, 2048);
   scene.add(new THREE.HemisphereLight('#cfe3f7', '#9a8f80', 0.95));
 
   const AV = opts.avenues || [-120, 0, 120], ST = opts.streets || [-240, -160, -80, 0, 80, 160], AW = opts.aw || 24, SW = opts.sw || 16, SIDE = 6;

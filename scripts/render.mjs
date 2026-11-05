@@ -62,12 +62,21 @@ async function openPage() {
 
 // render frames [i0, i1) of the timeline into a silent mp4
 async function renderSegment(i0, i1, file, tag) {
-  const p = await openPage();
+  let p = await openPage();
   const enc = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
     '-c:v', 'libx264', '-preset', 'slow', '-crf', '17', '-pix_fmt', 'yuv420p', '-r', String(FPS), file], { stdio: ['pipe', 'inherit', 'inherit'] });
   const t0 = Date.now();
   for (let i = i0; i < i1; i++) {
-    const buf = await p.frame(i / FPS);
+    let buf;
+    for (let attempt = 0; ; attempt++) {
+      try { buf = await p.frame(i / FPS); break; }
+      catch (e) { // a crashed GPU/renderer process: reopen the page and retry this frame
+        if (attempt >= 2) throw e;
+        console.log(`[${tag}] frame ${i} failed (${e.message.split('\n')[0]}), reopening page`);
+        try { await p.browser.close(); } catch {}
+        p = await openPage();
+      }
+    }
     if (!enc.stdin.write(buf)) await new Promise((r) => enc.stdin.once('drain', r));
     if ((i - i0) % (FPS * 2) === 0) {
       const done = i - i0 + 1, el = (Date.now() - t0) / 1000;
