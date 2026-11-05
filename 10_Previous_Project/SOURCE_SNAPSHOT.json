@@ -1,0 +1,167 @@
+{
+  "repository": "https://github.com/zzand8192/3D-Simulations",
+  "branch": "what-if-underwater",
+  "commit": "150641c4ff89c4a5872a045e893b8e092bed0f07",
+  "inspected_date": "2026-11-04",
+  "snapshot_relative_path": "10_Previous_Project/what-if-underwater",
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 97,
+      "sha256": "d54a1d0041e9ea936dfb29ca1d8fb3edf5f26293343091eec49114b433152c30"
+    },
+    {
+      "path": "CLAUDE.md",
+      "bytes": 3468,
+      "sha256": "c6394667fa7d2004db535773a11accd4ce194d314a429c1e8101e12481618323"
+    },
+    {
+      "path": "docs/MAKING-VIDEOS.md",
+      "bytes": 18815,
+      "sha256": "3b73a74fe53093408eba5e7a6c4c6c82eb5253d8d8ab09216bcc532b4195eef7"
+    },
+    {
+      "path": "output/what-if-underwater.mp4",
+      "bytes": 44077668,
+      "sha256": "d17cee2cfd6fd39db6e2dd87cb87294ebf9380b8311e91b796736e04f996c051"
+    },
+    {
+      "path": "package.json",
+      "bytes": 445,
+      "sha256": "cf0a9dc97353c7a30d9f0cb2792f421ff5dee2b2d05de5c7e23375d015801707"
+    },
+    {
+      "path": "README.md",
+      "bytes": 5945,
+      "sha256": "0dd121852c3546b915a6d35df23548fd440a4b6f7165fa9e2f0e5c55e5d4dbba"
+    },
+    {
+      "path": "scripts/audio.py",
+      "bytes": 10039,
+      "sha256": "1ae5fbe41732bc59eb8f1a34e00f6e09980812abfa8e8005a14a00621c1923b8"
+    },
+    {
+      "path": "scripts/render.mjs",
+      "bytes": 6521,
+      "sha256": "733a59b9030b712f16df7de4335daff5b8e61f0d056518ee4ca357775c6cb8e5"
+    },
+    {
+      "path": "src/character.js",
+      "bytes": 16716,
+      "sha256": "b0a3b0d679f80323c40b6453d724bc93406b3940e65d0801eb5c32e2f220d4df"
+    },
+    {
+      "path": "src/cues.json",
+      "bytes": 4471,
+      "sha256": "d3c7985866f8e0a4322fb8ca9dd5c4b02296ffbf1eef855ca2bfa0e9d24930de"
+    },
+    {
+      "path": "src/env.js",
+      "bytes": 23330,
+      "sha256": "33eeae8be00639d754c049cf257e3d4d8973974dcbfd4b1c8c5b02e8dc289714"
+    },
+    {
+      "path": "src/fonts/cormorant-garamond-latin-400-italic.woff2",
+      "bytes": 21612,
+      "sha256": "effe3ef07d4e0d249d837344e70bdf50fc94ccc44870b02103dad9a75d4e003f"
+    },
+    {
+      "path": "src/fonts/cormorant-garamond-latin-400-normal.woff2",
+      "bytes": 20648,
+      "sha256": "a9ff7df676353c21f7159a220f19b7d60b53910351ae822322b5280f30664acf"
+    },
+    {
+      "path": "src/fonts/cormorant-garamond-latin-500-italic.woff2",
+      "bytes": 21956,
+      "sha256": "66b937da1d31b12fa88c8ca30027b668961bc40421451700fc182f745a3f7a6e"
+    },
+    {
+      "path": "src/fonts/cormorant-garamond-latin-500-normal.woff2",
+      "bytes": 20940,
+      "sha256": "991c8aba7707066e8d0f351d53a4eedee3b5f00d1db335d9a2ee39903b4b0c8c"
+    },
+    {
+      "path": "src/fonts/cormorant-garamond-latin-600-italic.woff2",
+      "bytes": 21652,
+      "sha256": "5a1cf344eb88eb7917d82c055c5389eb1bfc2420803497cbc8a0ed4d82c14fc4"
+    },
+    {
+      "path": "src/fonts/cormorant-garamond-latin-600-normal.woff2",
+      "bytes": 21012,
+      "sha256": "066ec1ac2852906b7e7253ee3c129e0efd2343d8671712db064502f03228ccb0"
+    },
+    {
+      "path": "src/fonts/eb-garamond-latin-400-normal.woff2",
+      "bytes": 21720,
+      "sha256": "562fb60b9d94f089e2e35c61b86e4c5c135bb96cb814d5e7b32b60427f10a0f6"
+    },
+    {
+      "path": "src/fonts/eb-garamond-latin-500-normal.woff2",
+      "bytes": 23104,
+      "sha256": "934a8490f74318ff971137800f576728532a3bef9dc7fe2b877db4e010875869"
+    },
+    {
+      "path": "src/fonts/LICENSE-cormorant-garamond.txt",
+      "bytes": 4478,
+      "sha256": "1c640f38769fbd413926652db5ce5c29e1ea545f371cd0c0b5b760e6f1f61139"
+    },
+    {
+      "path": "src/fonts/LICENSE-eb-garamond.txt",
+      "bytes": 4489,
+      "sha256": "17a2ca8bb164b469f337d29d236c70eb6e72500e0a9c74f2784ef0c9988c35ad"
+    },
+    {
+      "path": "src/index.html",
+      "bytes": 1598,
+      "sha256": "56e27f6a26394d9c3c0bea961803c3d7c8d824bc877261d1d424d9e2c14c76ef"
+    },
+    {
+      "path": "src/main.js",
+      "bytes": 4763,
+      "sha256": "7139871613e5ec026b421376f7e211b749a64dc55d9705364620c00af4262144"
+    },
+    {
+      "path": "src/props.js",
+      "bytes": 16500,
+      "sha256": "e00d2251df931513ec40485583286be380f701af44a7f527892acde6e8b66f14"
+    },
+    {
+      "path": "src/scenes.js",
+      "bytes": 55634,
+      "sha256": "37792599e370d8489c124e9b157c5db7444de1021e19669f07d81e0b012ca817"
+    },
+    {
+      "path": "src/style.css",
+      "bytes": 5263,
+      "sha256": "01e1e8da180246e3cd647e3009b9f764e70bd201101f3dcf51da1ff4d2dce628"
+    },
+    {
+      "path": "src/timeline.js",
+      "bytes": 23322,
+      "sha256": "4402afd1dbba76d5e1fc041d5b892e24fa7ba35b59b6f6f53868c5ce56ac4a7c"
+    },
+    {
+      "path": "src/ui.js",
+      "bytes": 4522,
+      "sha256": "96bc1c9ef437fb86a7753d6151bede7757be057cf0a7434af341587911eeabf1"
+    },
+    {
+      "path": "src/vendor/RoundedBoxGeometry.js",
+      "bytes": 4792,
+      "sha256": "ab3db68f4743fdbcc267a15365ae1b011136750b14dc56fc62afdcd90cb0ecf1"
+    },
+    {
+      "path": "src/vendor/three-LICENSE.txt",
+      "bytes": 1102,
+      "sha256": "f57eb9202058667d12aebd854fe8a86d6feaeab51078180df5615bfdbd5cff05"
+    },
+    {
+      "path": "src/vendor/three.module.js",
+      "bytes": 1369252,
+      "sha256": "da7f8aecb0b1e4a55e820cce5dc5a5a8eb13dc379758f215e8fb07937be7a6a3"
+    }
+  ],
+  "copy_hashes_verified": true,
+  "remote_modified": false,
+  "project_scripts_executed": false
+}

@@ -1,0 +1,235 @@
+{
+  "status": "Provisional automated speech recognition. Direct listening unavailable. Empty segments do not establish speech absence.",
+  "reference_files": [
+    {
+      "file": 9,
+      "segments": []
+    },
+    {
+      "file": 10,
+      "segments": []
+    },
+    {
+      "file": 11,
+      "segments": []
+    },
+    {
+      "file": 12,
+      "segments": [
+        {
+          "start": 0.37,
+          "end": 2.37,
+          "text": " Thanks, you do it.",
+          "no_speech": 0.214
+        },
+        {
+          "start": 2.37,
+          "end": 3.37,
+          "text": " Agh!",
+          "no_speech": 0.214
+        },
+        {
+          "start": 3.37,
+          "end": 4.37,
+          "text": " Agh!",
+          "no_speech": 0.214
+        },
+        {
+          "start": 4.37,
+          "end": 5.37,
+          "text": " Agh!",
+          "no_speech": 0.214
+        },
+        {
+          "start": 5.37,
+          "end": 8.16,
+          "text": " Agh!",
+          "no_speech": 0.214
+        },
+        {
+          "start": 8.16,
+          "end": 9.16,
+          "text": " Yes!",
+          "no_speech": 0.214
+        },
+        {
+          "start": 9.16,
+          "end": 10.16,
+          "text": " Agh!",
+          "no_speech": 0.214
+        },
+        {
+          "start": 10.16,
+          "end": 13.72,
+          "text": " Agh!",
+          "no_speech": 0.214
+        },
+        {
+          "start": 13.72,
+          "end": 14.72,
+          "text": " Agh!",
+          "no_speech": 0.214
+        }
+      ]
+    },
+    {
+      "file": 13,
+      "segments": [
+        {
+          "start": 0.0,
+          "end": 3.12,
+          "text": " What if glucose disappear for five seconds?",
+          "no_speech": 0.007
+        },
+        {
+          "start": 3.12,
+          "end": 4.12,
+          "text": " Aye!",
+          "no_speech": 0.007
+        },
+        {
+          "start": 4.12,
+          "end": 5.12,
+          "text": " Aye!",
+          "no_speech": 0.007
+        },
+        {
+          "start": 5.12,
+          "end": 6.12,
+          "text": " Aye!",
+          "no_speech": 0.007
+        },
+        {
+          "start": 6.12,
+          "end": 32.02,
+          "text": " And it's later?",
+          "no_speech": 0.007
+        },
+        {
+          "start": 32.02,
+          "end": 34.02,
+          "text": " Why is the cold pulling back?",
+          "no_speech": 0.007
+        }
+      ]
+    },
+    {
+      "file": 14,
+      "segments": [
+        {
+          "start": 0.0,
+          "end": 5.6,
+          "text": " What if a penny doubled every day for 30 days, a million dollars now?",
+          "no_speech": 0.008
+        },
+        {
+          "start": 5.6,
+          "end": 11.66,
+          "text": " Or the penny?",
+          "no_speech": 0.008
+        },
+        {
+          "start": 11.66,
+          "end": 33.26,
+          "text": " Day 11, $10.24, Day 20, taller than one World Trade Center, Day 27, it's in space and it's",
+          "no_speech": 0.008
+        },
+        {
+          "start": 33.26,
+          "end": 34.94,
+          "text": " still not a million.",
+          "no_speech": 0.008
+        },
+        {
+          "start": 34.94,
+          "end": 37.26,
+          "text": " Day 28, the penny wins.",
+          "no_speech": 0.008
+        },
+        {
+          "start": 37.26,
+          "end": 46.33,
+          "text": " Day 30, over $5,000,000, but in February, you stop at Day 28.",
+          "no_speech": 0.008
+        },
+        {
+          "start": 46.33,
+          "end": 54.77,
+          "text": " In real life, the U.S. mint struck its last penny for circulation in 2025.",
+          "no_speech": 0.011
+        },
+        {
+          "start": 54.77,
+          "end": 57.77,
+          "text": " Which would you take?",
+          "no_speech": 0.011
+        }
+      ]
+    },
+    {
+      "file": 15,
+      "segments": [
+        {
+          "start": 1.78,
+          "end": 2.78,
+          "text": " Ugh.",
+          "no_speech": 0.333
+        }
+      ]
+    },
+    {
+      "file": 16,
+      "segments": [
+        {
+          "start": 1.62,
+          "end": 3.62,
+          "text": " You",
+          "no_speech": 0.859
+        }
+      ]
+    },
+    {
+      "file": 17,
+      "segments": []
+    },
+    {
+      "file": 18,
+      "segments": []
+    },
+    {
+      "file": 19,
+      "segments": [
+        {
+          "start": 2.67,
+          "end": 4.67,
+          "text": " You",
+          "no_speech": 0.888
+        }
+      ]
+    },
+    {
+      "file": 20,
+      "segments": []
+    },
+    {
+      "file": 21,
+      "segments": []
+    },
+    {
+      "file": 22,
+      "segments": []
+    },
+    {
+      "file": 23,
+      "segments": []
+    },
+    {
+      "file": 24,
+      "segments": []
+    },
+    {
+      "file": 25,
+      "segments": []
+    }
+  ]
+}

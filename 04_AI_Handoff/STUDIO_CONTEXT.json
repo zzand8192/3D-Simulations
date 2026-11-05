@@ -1,0 +1,125 @@
+{
+  "studio": "3D Simulations - Studio Bible",
+  "version": "1.2",
+  "compiled_date": "2026-11-04",
+  "authority_order": [
+    "Latest direct instruction from Isaac",
+    "Confirmed decisions",
+    "Labeled working defaults",
+    "Reference observations and interpretations",
+    "Historical assistant proposals"
+  ],
+  "confirmed": {
+    "style": "Cinematic Roblox-inspired 3D What If simulations",
+    "greg": {
+      "name": "Greg",
+      "role": "Recurring supporting character and anticipated series feature",
+      "personality": "Often unlucky",
+      "appearance_anchors": [
+        "baseball cap",
+        "blue hoodie",
+        "black pants"
+      ],
+      "location_rule": "Different places across separate simulations",
+      "scene_function": "Ordinary task interrupted by the hypothetical event after the event is established",
+      "final_design_status": "Pending creation by Claude",
+      "looks_folder": "03_Greg/Looks",
+      "model_creator": "Claude",
+      "isaac_role": "Creative direction and review",
+      "looks_folder_currently_empty": true,
+      "looks_folder_receives_actual_references_from_model_creation": true
+    }
+  },
+  "working_defaults": {
+    "minimum_duration_seconds": 60,
+    "external_narrator": false,
+    "natural_dialogue": true,
+    "optional_in_world_news": true,
+    "opening": "Centered white serif question with smaller informational labels afterward",
+    "proposed_export": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30
+    },
+    "greg_featured_appearances": "One, with optional background sighting or return as useful",
+    "greg_endings": "Flexible"
+  },
+  "unapproved_prior_character_suggestions": {
+    "cap": "black and forward-facing",
+    "hoodie": "medium blue with front pocket",
+    "shoes": "white sneakers",
+    "age": 23,
+    "voice": "casual and mildly sarcastic"
+  },
+  "open": [
+    "Final Greg face, body, skin tone, palette, model, rig, and voice",
+    "Final fonts and reusable UI project",
+    "Platform mix and schedule",
+    "Renderer and editor",
+    "Team and budget"
+  ],
+  "superseded_interpretations": [
+    "Required Greg appearances in multiple countries during every episode",
+    "Original assistant-proposed name Milo"
+  ],
+  "reference_evidence": {
+    "count": 25,
+    "tsunami_count": 13,
+    "native_size": [
+      576,
+      1024
+    ],
+    "native_fps": 30,
+    "frames_decoded": 48453,
+    "visual_method": "Sampled sequences and selected enlarged frames",
+    "direct_audio_listening": false,
+    "audio_method": "Energy timing and provisional speech recognition",
+    "individual_views_verified": false,
+    "scientific_claims_independently_verified": false
+  },
+  "required_episode_fields": [
+    "Premise",
+    "Assumptions",
+    "Audience promise",
+    "Final payoff",
+    "Timed outline",
+    "Greg scene",
+    "Shot table",
+    "UI",
+    "Dialogue or captions",
+    "Sound",
+    "Assets",
+    "Fact checks",
+    "Review"
+  ],
+  "previous_project": {
+    "repository": "https://github.com/zzand8192/3D-Simulations",
+    "branch": "what-if-underwater",
+    "commit": "150641c4ff89c4a5872a045e893b8e092bed0f07",
+    "local_snapshot": "10_Previous_Project/what-if-underwater",
+    "character_builder": "src/character.js",
+    "cast_table": "src/scenes.js",
+    "cast_entries": 15,
+    "implemented_style": "Low-poly people with human proportions, rounded heads, drawn faces, and trimmed T-shirts",
+    "dialogue": "Speech bubbles with no spoken voices in the old project",
+    "reuse_candidates": [
+      "Configurable geometry",
+      "Cap",
+      "Long sleeves",
+      "Pants",
+      "Facial expressions",
+      "Joint hierarchy",
+      "Motion presets",
+      "UI",
+      "Bundled fonts",
+      "Procedural sound",
+      "Renderer"
+    ],
+    "greg_spec_found": false,
+    "hoodie_specific_geometry_found": false,
+    "greg_final_design_remains_uncreated": true,
+    "looks_folder_remains_empty": true,
+    "render_pipeline_rerun": false,
+    "authority": "Recovered prior-project implementation and documented historical style, subject to current user direction"
+  }
+}
