@@ -26,6 +26,9 @@ Compiled November 4, 2026 from the available prior chat and this chat.
 | Date | Decision | Source | Documents updated |
 | --- | --- | --- | --- |
 | 2026-11-04 | Initial handbook compiled and current corrections reconciled | Available chats and 25 local references | Version 1.0 |
+| 2026-11-05 | Character style: Isaac rejected a blocky Roblox-style test and confirmed the low-poly human-proportion characters from the underwater episode | Isaac, in chat with screenshot | 03_Greg, CLAUDE.md |
+| 2026-11-05 | GREG_v1 created by Claude; first episode EP001 "What if every road disappeared?" rendered (v01, 99 s) | EP001 production | 03_Greg/Model, Looks, EP001 folder |
+| 2026-11-05 | EP001 dialogue shown as bottom subtitles (per the EP001 prompt) with no voice audio (Isaac's earlier instruction) | EP001 prompt plus earlier chat | EP001 brief (open choice: bubbles or subtitles) |
 
 ## Next concrete work
 

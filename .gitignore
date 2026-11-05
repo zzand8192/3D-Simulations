@@ -4,3 +4,5 @@ output/clip*.mp4
 output/.segments/
 output/audio.wav
 .DS_Store
+**/audio.wav
+**/.segments/

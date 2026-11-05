@@ -38,7 +38,7 @@ const server = createServer(async (req, res) => {
   } catch { res.writeHead(404); res.end(); }
 });
 await new Promise((r) => server.listen(0, '127.0.0.1', r));
-const url = `http://127.0.0.1:${server.address().port}/index.html?render=1`;
+const url = `http://127.0.0.1:${server.address().port}/${args.page || 'index.html'}?render=1`;   // --page model_sheet.html
 const DURATION = JSON.parse(await readFile(join(SRC, 'cues.json'), 'utf8')).duration;
 
 async function openPage() {

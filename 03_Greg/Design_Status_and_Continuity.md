@@ -1,6 +1,20 @@
 # Greg design status and continuity
 
-## Asset state
+## Current model — GREG_v1 (2026-11-05)
+
+Claude created GREG_v1 and first used it in EP001. It is waiting for Isaac's review. The references are `03_Greg/Looks/GREG_v1_*.png`: front, three-quarter, side and back views, four expressions, and seated, food-in-hand and recognition poses. The spec, palette, rig and limitations are in `03_Greg/Model/GREG_v1_spec.json`.
+
+| Feature | v1 value |
+| --- | --- |
+| Style | Studio low-poly character with human proportions (Isaac confirmed this style on 2026-11-05) |
+| Cap | Black #141518, worn forward |
+| Hoodie | Medium blue #2f6fd6 with hood, kangaroo pocket, white drawstrings, ribbed cuffs and waistband #2456b0 |
+| Pants | Straight black #18191d |
+| Shoes | White sneakers |
+| Skin / hair | #d8a47f / short dark brown #2b1a10 |
+| Voice | None (the series uses no voice audio so far) |
+
+## Asset state (before v1)
 
 Final character model, character reference sheet, approved face, voice, rig, and animation set remain uncreated in this studio pack. Isaac requested an empty Looks folder. Claude will create Greg's model. Keep Looks empty until that work produces character references. No placeholder, hidden keep-file, generated concept, or README belongs inside it.
 

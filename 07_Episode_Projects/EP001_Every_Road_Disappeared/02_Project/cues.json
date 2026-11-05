@@ -1,0 +1,51 @@
+{
+  "episode": "EP001",
+  "duration": 99,
+  "tv": 5.35,
+  "title": { "text": "What if every road disappeared?", "start": 0.3, "hold": 2.5, "morph": 4.1 },
+  "labels": [
+    { "start": 3.1, "end": 9.4, "k": "DAY #1", "v": "THE DISAPPEARANCE" },
+    { "start": 9.9, "end": 21.4, "k": "MINUTES LATER", "v": "TRANSPORTATION DISRUPTED" },
+    { "start": 21.9, "end": 37.1, "k": "BREAKING NEWS", "v": "GLOBAL ROAD DISAPPEARANCE" },
+    { "start": 37.6, "end": 42.8, "k": "DAY #1", "v": "ARIZONA, USA" },
+    { "start": 50.9, "end": 64.3, "k": "DAY #3", "v": "SUPPLY CHAINS DISRUPTED" },
+    { "start": 64.8, "end": 79.4, "k": "MONTH #6", "v": "A NEW TRANSPORTATION SYSTEM" },
+    { "start": 79.9, "end": 85.0, "k": "MONTH #6", "v": "ARIZONA, USA" },
+    { "start": 88.5, "end": 96.5, "k": "YEAR #5", "v": "THE WORLD REBUILT" }
+  ],
+  "subs": [
+    { "id": "ped1", "start": 6.5, "end": 9.3, "who": "ped1", "text": "Wait… where’d the road go?" },
+    { "id": "drv1", "start": 11.0, "end": 13.6, "who": "driver", "text": "I was literally driving on it!" },
+    { "id": "home1", "start": 15.0, "end": 17.4, "who": "homeowner", "text": "What happened to our street?" },
+    { "id": "anc1", "start": 22.0, "end": 25.6, "who": "anchor", "text": "Breaking news. Roads have mysteriously vanished across the entire planet." },
+    { "id": "anc2", "start": 25.7, "end": 28.7, "who": "anchor", "text": "Officials are urging residents to avoid unnecessary travel." },
+    { "id": "rep1", "start": 29.3, "end": 31.8, "who": "reporter", "text": "Authorities here are still trying to understand" },
+    { "id": "rep2", "start": 31.9, "end": 34.3, "who": "reporter", "text": "how every street disappeared at exactly the same moment." },
+    { "id": "cash1", "start": 38.0, "end": 39.5, "who": "cashier", "text": "Anything else?" },
+    { "id": "greg1", "start": 39.7, "end": 41.5, "who": "greg", "text": "Nah, that’s everything." },
+    { "id": "greg2", "start": 48.3, "end": 50.4, "who": "greg", "text": "I just filled up." },
+    { "id": "cust1", "start": 51.2, "end": 53.2, "who": "customer", "text": "When’s the next shipment?" },
+    { "id": "emp1", "start": 53.4, "end": 55.5, "who": "employee", "text": "We’re still trying to figure that out." },
+    { "id": "anc3", "start": 71.9, "end": 73.9, "who": "anchor", "text": "Six months after the disappearance," },
+    { "id": "anc4", "start": 74.0, "end": 76.3, "who": "anchor", "text": "cities are rebuilding their transportation networks from the ground up." },
+    { "id": "wrk1", "start": 76.9, "end": 79.4, "who": "worker", "text": "Never thought I’d be this happy to see asphalt." },
+    { "id": "greg3", "start": 80.6, "end": 82.0, "who": "greg", "text": "Finally." },
+    { "id": "greg4", "start": 86.0, "end": 88.0, "who": "greg", "text": "Of course." }
+  ],
+  "news": [
+    { "start": 21.6, "end": 28.9, "place": "WORLD 24 · NEWSROOM", "head": "ROADS VANISH WORLDWIDE" },
+    { "start": 28.9, "end": 34.4, "place": "LIVE · TOKYO, JAPAN", "head": "ROADS VANISH WORLDWIDE" },
+    { "start": 34.4, "end": 35.8, "place": "LIVE · LONDON, UNITED KINGDOM", "head": "ROADS VANISH WORLDWIDE" },
+    { "start": 35.8, "end": 37.3, "place": "LIVE · SÃO PAULO, BRAZIL", "head": "ROADS VANISH WORLDWIDE" },
+    { "start": 71.5, "end": 76.4, "place": "LIVE · CENTRAL TRANSIT HUB", "head": "CITIES REBUILD TRANSPORT NETWORKS" }
+  ],
+  "shots": {
+    "nycWide": [0, 4.8], "tire": [4.8, 5.9], "reveal": [5.9, 9.6],
+    "downtown": [9.6, 13.8], "suburb": [13.8, 17.6], "highway": [17.6, 21.6],
+    "studio": [21.6, 28.9], "tokyo": [28.9, 34.4], "london": [34.4, 35.8], "sao": [35.8, 37.3],
+    "gasIn": [37.3, 43.0], "gasOut": [43.0, 45.4], "gasPov": [45.4, 46.5], "gasReact": [46.5, 50.6],
+    "grocery": [50.6, 55.6], "hospital": [55.6, 58.6], "station": [58.6, 61.6], "airport": [61.6, 64.5],
+    "paving": [64.5, 69.0], "adapt": [69.0, 71.5], "hub": [71.5, 76.4], "worker": [76.4, 79.6],
+    "gregBack": [79.6, 88.2], "year5": [88.2, 99]
+  }
+}

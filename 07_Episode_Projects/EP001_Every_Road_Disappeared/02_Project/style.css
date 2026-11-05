@@ -1,0 +1,57 @@
+@font-face { font-family: "Cormorant"; font-weight: 500; font-style: normal; src: url(fonts/cormorant-garamond-latin-500-normal.woff2) format("woff2"); }
+@font-face { font-family: "Cormorant"; font-weight: 600; font-style: normal; src: url(fonts/cormorant-garamond-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "EB Garamond"; font-weight: 400; src: url(fonts/eb-garamond-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "EB Garamond"; font-weight: 500; src: url(fonts/eb-garamond-latin-500-normal.woff2) format("woff2"); }
+
+:root { --s: 1; --shadow: 0 2px 6px rgba(0,0,0,.55), 0 0 26px rgba(0,0,0,.35); }
+html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+body { display: grid; place-items: center; }
+body.render { display: block; }
+
+#stage { position: relative; width: 1080px; height: 1920px; transform: scale(var(--s)); transform-origin: center; overflow: hidden; background: #04121c; flex: none; }
+body.render #stage { transform: none; }
+#gl { position: absolute; inset: 0; width: 1080px; height: 1920px; display: block; }
+#grade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(10,30,45,.14) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 70%, rgba(4,10,18,.3) 100%); mix-blend-mode: multiply; }
+#vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 85% at 50% 48%, rgba(0,0,0,0) 58%, rgba(0,0,0,.5) 100%); }
+#fade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; }
+
+/* ---------- safe area: 90px sides, text kept between y=250 and y=1500 ---------- */
+#ui { position: absolute; left: 90px; right: 90px; top: 0; bottom: 0; pointer-events: none; color: #fff; }
+
+#title {
+  position: absolute; left: 0; right: 0; top: 700px; margin: 0;
+  font-family: "Cormorant", "EB Garamond", Georgia, "Times New Roman", serif; font-weight: 500;
+  font-size: 104px; line-height: 1.04; text-align: center; letter-spacing: .003em;
+  text-shadow: 0 3px 10px rgba(0,0,0,.55), 0 0 40px rgba(0,0,0,.35);
+  transform-origin: 50% 50%; opacity: 0;
+}
+#title .w { display: inline-block; opacity: 0; }
+
+#label {
+  position: absolute; left: 0; top: 270px; display: flex; flex-direction: column; gap: 4px;
+  font-family: "EB Garamond", "Cormorant", Georgia, serif; text-shadow: var(--shadow); opacity: 0;
+}
+#label::before { content: ""; width: 54px; height: 1px; background: rgba(255,255,255,.8); margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.5); }
+#label .k { font-size: 48px; letter-spacing: .1em; font-weight: 500; }
+#label .v { font-size: 27px; letter-spacing: .26em; font-weight: 400; opacity: .88; }
+
+/* ---------- dialogue subtitles (bottom) ---------- */
+#subs { position: absolute; left: 90px; right: 90px; top: 1318px; display: flex; justify-content: center; opacity: 0; pointer-events: none; }
+#subs p { margin: 0; max-width: 860px; padding: 14px 30px 16px; background: rgba(6, 10, 16, .55); border-radius: 12px;
+  font-family: "EB Garamond", Georgia, serif; font-size: 46px; line-height: 1.18; text-align: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+
+/* ---------- fictional broadcast graphics (only during the news segment) ---------- */
+#news { position: absolute; inset: 0; pointer-events: none; opacity: 0; font-family: "Helvetica Neue", Arial, sans-serif; }
+#news .bug { position: absolute; right: 100px; top: 262px; display: flex; align-items: stretch; height: 54px; box-shadow: 0 4px 14px rgba(0,0,0,.3); }
+#news .bug b { background: #c4161c; color: #fff; font-size: 30px; font-weight: 800; padding: 0 14px; display: flex; align-items: center; }
+#news .bug span { background: rgba(255,255,255,.92); color: #c4161c; font-size: 22px; font-weight: 800; letter-spacing: .12em; padding: 0 12px; display: flex; align-items: center; }
+#news .bar { position: absolute; left: 90px; right: 90px; top: 1296px; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+#news .tag { display: inline-block; background: #c4161c; color: #fff; font-weight: 800; font-size: 26px; letter-spacing: .1em; padding: 8px 16px; }
+#news .head { background: #fff; color: #0d1830; font-weight: 800; font-size: 34px; padding: 12px 18px; letter-spacing: .01em; }
+#news .place { background: #0d1830; color: #dbe6ff; font-size: 22px; font-weight: 600; letter-spacing: .14em; padding: 8px 18px; }
+#news .ticker { position: absolute; left: 90px; right: 90px; top: 1452px; height: 40px; overflow: hidden; background: rgba(13,24,48,.86); color: #fff; font-size: 20px; font-weight: 600; letter-spacing: .06em; line-height: 40px; white-space: nowrap; }
+#news .ticker span { display: inline-block; padding-left: 20px; }
+
+#controls { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 10px; align-items: center; background: rgba(20,20,24,.8); color: #ddd; padding: 8px 12px; border-radius: 8px; font: 13px system-ui, sans-serif; }
+#controls[hidden] { display: none; }
+#controls input { width: min(60vw, 420px); }

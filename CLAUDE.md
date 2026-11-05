@@ -1,6 +1,12 @@
 # CLAUDE.md: 3D "What If?" simulation videos
 
-This repo makes cinematic, vertical (9:16) 3D simulation videos in code: Three.js scenes rendered frame by frame in headless Chromium, then encoded with ffmpeg. The first video is `src/` → `output/what-if-underwater.mp4`.
+This repo makes cinematic, vertical (9:16) 3D simulation videos in code: Three.js scenes rendered frame by frame in headless Chromium, then encoded with ffmpeg. The first video is `src/` → `output/what-if-underwater.mp4`. The studio bible starts at `00_START_HERE.md`.
+
+## Series notes (latest first)
+- **EP001 "What if every road disappeared?"** lives in `07_Episode_Projects/EP001_Every_Road_Disappeared/`, with the project in `02_Project` and the delivery in `03_Delivery`. It is the most complete engine to copy for new episodes: city builder with removable roads, vehicles, studio, interiors, and per-episode `audio.py`. Render it with `--src 07_Episode_Projects/<EP>/02_Project --out 07_Episode_Projects/<EP>/03_Delivery/<file>.mp4`.
+- **Characters:** Isaac confirmed (2026-11-05) the low-poly human-proportion style. A blocky Roblox-cube test was rejected. Always use `makeCharacter()`.
+- **Greg** is the recurring character. Build him with `makeCharacter(GREG)` (GREG_v1; see `03_Greg/Model` and `03_Greg/Looks`). Change his location and task every episode and log it in `03_Greg/Episode_Appearance_Log.md`.
+- **Dialogue:** there is never voice audio. Show text either as bubbles over heads (underwater) or subtitles near the bottom (EP001, per its prompt). Follow the episode prompt.
 
 **When the user asks for a new "What if…?" video, or any 3D simulation video, read `docs/MAKING-VIDEOS.md` first and follow it.** It is the full playbook: the house style, the engine API, the workflow, the camera math, and the mistakes to avoid. The rules below are the non-negotiables.
 

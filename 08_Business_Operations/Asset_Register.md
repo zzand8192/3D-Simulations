@@ -4,8 +4,10 @@ Register studio production assets here. Reference video metadata is kept in 06_R
 
 | Asset ID | Type | Filename or location | Creator or source | Usage terms recorded | Version | Approval state | Episodes used |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| GREG_MODEL | Character | Uncreated | Claude creates it using Isaac's direction | [fill when made] | [fill] | Open | [fill] |
-| UI_SYSTEM | Graphics | Specification in creative guide | Studio proposal | [fill when built] | [fill] | Open | [fill] |
+| GREG_MODEL | Character | 03_Greg/Model/GREG_v1_spec.json · builder in EP001 02_Project/character.js | Claude, from Isaac's direction | Original procedural code | v1 (2026-11-05) | Awaiting Isaac's review | EP001 |
+| UI_SYSTEM | Graphics | EP001 02_Project/ui.js + style.css | Claude | Original code; fonts under SIL OFL | EP001 | In use | EP001 |
+| EP001_SETS | Environments | EP001 02_Project/scenes_city.js, scenes_places.js | Claude | Original procedural code | v01 | In use | EP001 |
+| VEHICLES | Props | EP001 02_Project/vehicles.js (cars, taxi, buses, truck, ambulance, helicopter, airplane, trains, paver, roller, bike, barge, traffic light, barrier) | Claude | Original procedural code | v01 | In use | EP001 |
 
 ## Audio or font record
 
