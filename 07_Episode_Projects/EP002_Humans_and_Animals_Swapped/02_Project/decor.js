@@ -111,7 +111,7 @@ export function streetDressing(scene, seed = 41) {
   houseRow(scene, 43, -44, -150, 150, 0, 22);
   houseRow(scene, 45, 46, -150, 150, Math.PI, 22);
   const r = rng(seed);
-  for (let x = -140; x <= 140; x += 28) { const l = lamp(); l.position.set(x, 0.3, 19.5); l.rotation.y = Math.PI; scene.add(l); }
+  for (let x = -140; x <= 140; x += 28) { const l = lamp(); l.position.set(x, 0.3, -0.6); scene.add(l); }
   hills(scene, 47, { color: '#7f9a5a' });
   clouds(scene, 49);
 }
