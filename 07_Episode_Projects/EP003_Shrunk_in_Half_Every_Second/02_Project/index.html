@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>What If Humans and Animals Swapped Places?</title>
+<title>What If You Shrunk in Half Every Second?</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,21 +11,19 @@
   <canvas id="gl"></canvas>
   <div id="grade"></div>
   <div id="vignette"></div>
-  <div id="news">
-    <div class="bug"><b>W24</b><span>LIVE</span></div>
-    <div class="bar">
-      <div class="tag">BREAKING NEWS</div>
-      <div class="head">ANIMALS TAKE CHARGE WORLDWIDE</div>
-      <div class="place"></div>
-    </div>
-    <div class="ticker"><span>DOGS SWORN IN AS POLICE IN 140 COUNTRIES &nbsp;•&nbsp; CATS CONFIRM NAPS REMAIN NON-NEGOTIABLE &nbsp;•&nbsp; HUMANS ADVISED TO STAY CALM AND WAIT TO BE WALKED &nbsp;•&nbsp; LION ADDRESSES WORLD LEADERS &nbsp;•&nbsp; ZOOS REPORT REVERSED VISITOR NUMBERS &nbsp;•&nbsp; DOGS SWORN IN AS POLICE IN 140 COUNTRIES &nbsp;•&nbsp; CATS CONFIRM NAPS REMAIN NON-NEGOTIABLE &nbsp;•&nbsp; HUMANS ADVISED TO STAY CALM AND WAIT TO BE WALKED &nbsp;•&nbsp;</span></div>
-  </div>
+  <div id="flash"></div>
   <div id="ui">
     <h1 id="title"></h1>
-    <div id="label"><span class="k"></span><span class="v"></span></div>
+    <div id="counter">
+      <div class="sec"><span class="lab">SECOND</span><span id="c-sec">0</span></div>
+      <div class="row"><span class="lab">HEIGHT</span><span id="c-h" class="big">1.8 m</span></div>
+      <div class="row"><span class="lab">SMALLER THAN</span><span id="c-than" class="than">—</span></div>
+      <div id="tag"></div>
+    </div>
+    <p id="caption"></p>
   </div>
-  <div id="bubbles"></div>
   <div id="fade"></div>
+  <div id="card"><span class="k"></span></div>
 </div>
 <div id="controls" hidden>
   <button id="play">Pause</button>

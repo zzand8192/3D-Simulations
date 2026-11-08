@@ -1,0 +1,272 @@
+{
+  "duration": 75.0,
+  "title": {
+    "text": "What if you shrunk in half every second?",
+    "start": 0.35,
+    "hold": 2.75,
+    "morph": 3.85
+  },
+  "counter": {
+    "show": 3.45,
+    "hide": 64.6,
+    "showAgain": 66.6,
+    "end": 74.6
+  },
+  "than": {
+    "1": "AN AVERAGE ADULT",
+    "2": "A TYPICAL CHAIR",
+    "3": "A BASKETBALL",
+    "4": "A SMARTPHONE",
+    "5": "A TENNIS BALL",
+    "6": "A GOLF BALL",
+    "7": "A TYPICAL HOUSE KEY",
+    "8": "A LADYBUG",
+    "9": "A GRAIN OF RICE",
+    "10": "A SMALL ANT",
+    "11": "A COARSE GRAIN OF SAND",
+    "12": "A FLEA",
+    "13": "A DUST MITE",
+    "14": "A PARAMECIUM",
+    "15": "THE WIDTH OF A HUMAN HAIR",
+    "16": "A SUNFLOWER POLLEN GRAIN",
+    "17": "A HUMAN SKIN CELL",
+    "18": "A RED BLOOD CELL",
+    "19": "A YEAST CELL",
+    "20": "MANY BACTERIA",
+    "21": "A MITOCHONDRION",
+    "22": "A WAVE OF RED LIGHT",
+    "23": "A WAVE OF VIOLET LIGHT",
+    "24": "MANY VIRUSES",
+    "25": "A FLU VIRUS",
+    "26": "A POLIOVIRUS",
+    "27": "A RIBOSOME",
+    "28": "AN ANTIBODY",
+    "29": "A HEMOGLOBIN MOLECULE",
+    "30": "THE WIDTH OF DNA",
+    "31": "A SUGAR MOLECULE",
+    "32": "A CAESIUM ATOM",
+    "33": "A WATER MOLECULE",
+    "34": "AN OXYGEN ATOM",
+    "35": "A HYDROGEN ATOM",
+    "47": "A URANIUM NUCLEUS",
+    "48": "AN IRON NUCLEUS",
+    "49": "AN OXYGEN NUCLEUS",
+    "50": "A PROTON",
+    "117": "THE PLANCK LENGTH"
+  },
+  "captions": [
+    {
+      "start": 27.0,
+      "end": 29.6,
+      "text": "Now below what any light microscope can resolve."
+    },
+    {
+      "start": 57.4,
+      "end": 62.6,
+      "text": "Electrons and quarks have no measured size."
+    },
+    {
+      "start": 67.6,
+      "end": 73.4,
+      "text": "Below the Planck length, known physics can no longer reliably describe what happens."
+    }
+  ],
+  "tag": {
+    "start": 26.2,
+    "end": 64.5,
+    "text": "Scientific illustration"
+  },
+  "tag2": {
+    "start": 66.8,
+    "end": 74.4,
+    "text": "Scientific illustration"
+  },
+  "jumpCard": {
+    "start": 65.25,
+    "end": 66.65,
+    "text": "57 SECONDS LATER"
+  },
+  "fade": [
+    [
+      0,
+      0.35,
+      "in"
+    ],
+    [
+      64.6,
+      65.15,
+      "out"
+    ],
+    [
+      66.6,
+      67.0,
+      "in"
+    ],
+    [
+      73.6,
+      74.6,
+      "out"
+    ]
+  ],
+  "stages": {
+    "city": [
+      0,
+      13.8
+    ],
+    "splash": 17.62,
+    "micro": [
+      17.62,
+      27.4
+    ],
+    "molecular": [
+      27.4,
+      38.2
+    ],
+    "atomic": [
+      38.2,
+      50.6
+    ],
+    "nucleus": [
+      50.6,
+      55.6
+    ],
+    "proton": [
+      55.6,
+      64.6
+    ],
+    "foam": [
+      66.6,
+      75.0
+    ]
+  },
+  "sfx": [
+    {
+      "t": 7.15,
+      "kind": "stomp",
+      "g": 0.5
+    },
+    {
+      "t": 7.55,
+      "kind": "stomp",
+      "g": 0.55
+    },
+    {
+      "t": 8.2,
+      "kind": "stomp",
+      "g": 0.9
+    },
+    {
+      "t": 8.75,
+      "kind": "stomp",
+      "g": 0.6
+    },
+    {
+      "t": 9.0,
+      "kind": "coo",
+      "g": 0.7
+    },
+    {
+      "t": 9.9,
+      "kind": "coo",
+      "g": 0.5
+    },
+    {
+      "t": 10.6,
+      "kind": "flutter",
+      "g": 0.7
+    },
+    {
+      "t": 12.0,
+      "kind": "skitter",
+      "g": 0.35
+    },
+    {
+      "t": 14.0,
+      "kind": "skitter",
+      "g": 0.6
+    },
+    {
+      "t": 16.6,
+      "kind": "skitter",
+      "g": 0.45
+    },
+    {
+      "t": 17.62,
+      "kind": "splash",
+      "g": 1.0
+    },
+    {
+      "t": 18.0,
+      "kind": "swish",
+      "g": 0.5
+    },
+    {
+      "t": 22.0,
+      "kind": "bump",
+      "g": 0.5
+    },
+    {
+      "t": 24.0,
+      "kind": "swish",
+      "g": 0.45
+    },
+    {
+      "t": 34.0,
+      "kind": "shimmer",
+      "g": 0.55
+    },
+    {
+      "t": 36.2,
+      "kind": "bump",
+      "g": 0.45
+    },
+    {
+      "t": 36.9,
+      "kind": "bump",
+      "g": 0.4
+    },
+    {
+      "t": 37.5,
+      "kind": "bump",
+      "g": 0.45
+    },
+    {
+      "t": 38.6,
+      "kind": "shimmer",
+      "g": 0.6
+    },
+    {
+      "t": 50.2,
+      "kind": "rumble",
+      "g": 0.7
+    },
+    {
+      "t": 55.4,
+      "kind": "rumble",
+      "g": 0.8
+    },
+    {
+      "t": 67.0,
+      "kind": "shimmer",
+      "g": 0.4
+    }
+  ],
+  "shots": {
+    "city": [
+      0,
+      17.62
+    ],
+    "inside_droplet_and_below": [
+      17.62,
+      64.6
+    ],
+    "time_jump": [
+      64.6,
+      67.0
+    ],
+    "planck": [
+      67.0,
+      75.0
+    ]
+  }
+}
