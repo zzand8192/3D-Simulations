@@ -7,6 +7,7 @@ import { makeAnimal, addCollar } from './animals.js';
 import * as V from './vehicles.js';
 import * as P from './props.js';
 import { randomPerson, person, envFrom, sun, tree } from './scenes_city.js';
+import * as D from './decor.js';
 
 const v3 = (x, y, z) => new THREE.Vector3(x, y, z);
 const CM = (c, o = {}) => causticMaterial({ color: c, roughness: 0.7, ...o });
@@ -55,7 +56,7 @@ export function makeLeash(scene, color = '#c9473a', n = 18) {
   return g;
 }
 
-function outdoor(renderer, { top = '#3d7cc4', mid = '#d4e8f4', bottom = '#9fb08a', sunDir = v3(0.5, 0.7, 0.6), area = 60, fog = 300, sunColor = '#fff2dc', k = 2.8 } = {}) {
+function outdoor(renderer, { top = '#3d7cc4', mid = '#d4e8f4', bottom = '#9fb08a', sunDir = v3(0.5, 0.7, 0.6), area = 60, fog = 650, sunColor = '#fff2dc', k = 2.8 } = {}) {
   const scene = new THREE.Scene();
   scene.add(gradientDome({ top, mid, bottom, sunDir, sunColor: '#fff2d6', sunSize: 0.03 }));
   scene.environment = envFrom(renderer, gradientDome({ top, mid, bottom })); scene.environmentIntensity = 0.7;
@@ -86,6 +87,7 @@ export function buildOffice(renderer) {
   const plate = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.5, 0.4), [CM('#c9a227'), CM('#c9a227'), CM('#c9a227'), CM('#c9a227'), CM('#fff', { map: V.textTex('CEO', { w: 256, h: 64, bg: '#c9a227', fg: '#1a1a1a', font: '700 44px Georgia, serif' }) }), CM('#c9a227')]); plate.position.set(2.6, 3.75, 1.2); desk.add(plate);
   const mug = new THREE.Group(); mug.add(new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.28, 0.7, 14), CM('#f2f2f2'))); mug.children[0].castShadow = true; scene.add(mug);
   const chair = V.at(V.B(3, 4.5, 0.6, CM('#1b1b1b'), 0.3), 0, 3.6, -9.2); scene.add(chair);
+  { const r = rng(91); const bs = D.bookshelf(r, 7, 9); bs.position.set(-21.2, 0, -4); bs.rotation.y = Math.PI / 2; scene.add(bs); const f = D.frame('EMPLOYEE\nOF THE\nMONTH: ME', 3.6, 3.6, '#fff6d8'); f.position.set(21.9, 8, -4); f.rotation.y = -Math.PI / 2; scene.add(f); }
   const ceo = put(scene, animal.ceo(), 0, 0.85, -8.4, 0);
   const kevin = put(scene, makeCharacter(HUMANS.kevin), 3.4, 0, -1.4, -2.6);
   const papers = V.at(V.B(1.2, 0.08, 1.6, CM('#fafafa')), 3.4, 0, -1.4); scene.add(papers); papers.visible = false;
@@ -109,6 +111,7 @@ export function buildPodium(renderer) {
   const pod = new THREE.Group(); pod.position.set(0, 3.2, -10); scene.add(pod);
   pod.add(V.at(V.B(3.4, 4, 2, CM('#3a281e')), 0, 2, 0), V.at(new THREE.Mesh(new THREE.CircleGeometry(0.9, 20), new THREE.MeshBasicMaterial({ color: '#c9a227' })), 0, 2.6, 1.02));
   for (let i = 0; i < 5; i++) { const m = new THREE.Group(); m.add(V.at(V.B(0.08, 1.4, 0.08, CM('#333')), 0, 0.7, 0), V.at(V.B(0.3, 0.4, 0.3, CM(['#c4161c', '#2f6fe0', '#222', '#3aa76d', '#f2c230'][i])), 0, 1.5, 0)); m.position.set(-0.8 + i * 0.4, 3.4, 0.9); m.rotation.x = -0.25; pod.add(m); }
+  D.podiumDressing(scene);
   const lion = put(scene, animal.lion(), 0, 3.6, -11.9, 0);
   const press = [];
   for (let i = 0; i < 16; i++) { const a = randomAnimal(r); let x = -16 + (i % 8) * 4.4 + r(), z = 6 + Math.floor(i / 8) * 4.5 + r(); if (Math.abs(x) < 4.5) x += Math.sign(x || 1) * 5; put(scene, a, x, 0, z, Math.PI + (r() - 0.5) * 0.4); const cam = V.at(V.B(0.8, 0.6, 0.9, CM('#222')), 0, -0.3, 0.3); if (i % 3 === 0) a.armR.hand.add(cam); press.push({ a, ph: r() * 6, cam: i % 3 === 0 }); }
@@ -148,10 +151,14 @@ export function buildZoo(renderer) {
   for (let i = 0; i < 5; i++) { const h = makeCharacter(randomPerson(r)); put(scene, h, -24 + i * 5 + r() * 2, 0, -10 + r() * 6, r() * 6); exhibits.push({ h, ph: r() * 6, sit: i % 2 === 0 }); }
   for (let i = 0; i < 12; i++) { const a = randomAnimal(r); put(scene, a, 13 + (i % 3) * 2.4 + r(), 0, -14 + Math.floor(i / 3) * 8 + r() * 3, -Math.PI / 2 + (r() - 0.5) * 0.6); const cam = V.at(V.B(0.6, 0.5, 0.7, CM('#222')), 0, -0.3, 0.3); if (i % 2 === 0) a.armR.hand.add(cam); visitors.push({ a, ph: r() * 6, cam: i % 2 === 0 }); }
   const joey = put(scene, makeAnimal('kangaroo', 'none', { scale: 0.55 }), 14.5, 0, 9, -Math.PI / 2);
+  D.zooDressing(scene);
+  // more visitors strolling on the path
+  const strollers = []; for (let i = 0; i < 6; i++) { const a = randomAnimal(r); scene.add(a.root); strollers.push({ a, ph: r() * 6, z0: -40 + i * 14, sp: (i % 2 ? 1 : -1) * 2.2 }); }
   scene.userData.update = (t) => {
     exhibits.forEach((e) => { e.h.pose(e.sit ? motion.sitFloor(t, e.ph) : mergePose(motion.idle(t, 1, e.ph), motion.shrug)); e.h.setFace({ eyes: 'half', mouth: 'flat', brows: 'flat' }, t, false, e.ph); });
     visitors.forEach((v) => { v.a.pose(mergePose(motion.idle(t, 1, v.ph), v.cam ? { aRx: -1.45, eR: -1.25 } : motion.point)); v.a.setFace({ eyes: 'happy' }, t, Math.sin(t * 1.1 + v.ph) > 0.7, v.ph); v.a.wag(t); });
     joey.pose(mergePose(motion.idle(t), { aRx: -1.4, eR: -1.2 })); joey.setFace({ eyes: 'wide' }, t); joey.wag(t, 0.3);
+    strollers.forEach((q) => { const z = ((q.z0 + q.sp * t) % 90 + 135) % 90 - 45; q.a.root.position.set(16 + (q.sp > 0 ? -1.2 : 1.2), 0, z); q.a.root.rotation.y = q.sp > 0 ? 0 : Math.PI; q.a.pose(motion.walk(t, 0.85, q.ph)); q.a.wag(t); q.a.setFace({ eyes: 'happy' }, t, Math.sin(t + q.ph) > 0.6, q.ph); });
   };
   Object.assign(scene.userData, { actors: { greg, keeper }, paper, exposure: 1.0, caustic: 0 });
   return scene;
@@ -166,8 +173,10 @@ export function buildDogPark(renderer) {
   const sign = V.signPost('HUMAN PARK\nOFF-LEASH AREA', { w: 6, h: 2.6, bg: '#3f5a2a', height: 6 }); sign.position.set(-9, 0, 4); scene.add(sign);
   const dogs = [put(scene, animal.parkdog(), -3, 0, 6, Math.PI - 0.5), put(scene, makeAnimal('dog', 'casual', { spec: { top: { kind: 'tee', color: '#e94f6a', trim: '#fff' } } }), 2.5, 0, 7, Math.PI + 0.4)];
   const humans = []; for (let i = 0; i < 4; i++) { const h = makeCharacter(randomPerson(r)); addCollar(h, ['#c9473a', '#2f6fe0', '#3aa76d', '#f2c230'][i]); put(scene, h, -4 + i * 2.6, 0, 0, Math.PI); humans.push({ h, ph: r() * 6 }); }
+  D.parkDressing(scene);
+  const bg = []; for (let i = 0; i < 8; i++) { const isDog = i % 2 === 0; const c = isDog ? randomAnimal(r) : makeCharacter(randomPerson(r)); if (!isDog) addCollar(c); c.root.position.set(-30 + i * 8, 0, -30 + (i % 3) * 3); c.root.rotation.y = r() * 6; scene.add(c.root); bg.push({ c, ph: r() * 6 }); }
   const frisbee = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.1, 18), CM('#f2c230')); frisbee.castShadow = true; scene.add(frisbee);
-  Object.assign(scene.userData, { dogs, humans, frisbee, exposure: 1.0, caustic: 0, update() {} });
+  Object.assign(scene.userData, { dogs, humans, frisbee, exposure: 1.0, caustic: 0, update(t) { bg.forEach((q, i) => { q.c.root.position.x = -30 + i * 8 + Math.sin(t * 0.5 + q.ph) * 3; q.c.pose(motion.walk(t, 0.7, q.ph)); q.c.root.rotation.y = Math.cos(t * 0.5 + q.ph) > 0 ? Math.PI / 2 : -Math.PI / 2; q.c.setFace({ eyes: 'happy', mouth: 'smile' }, t, false, q.ph); q.c.wag?.(t); }); } });
   return scene;
 }
 
@@ -187,6 +196,7 @@ export function buildPetStore(renderer) {
   for (let x = -9; x <= 9; x += 1.5) pen.add(V.at(V.B(0.12, 1.6, 0.12, CM('#d9d9d9')), x, 0.8, 3));
   const glass = new THREE.Mesh(new THREE.PlaneGeometry(22, 8), new THREE.MeshStandardMaterial({ color: '#cfefff', transparent: true, opacity: 0.12, roughness: 0.05, depthWrite: false })); glass.position.set(0, 7, 0.55); glass.renderOrder = 5; shop.add(glass);
   const humans = []; for (let i = 0; i < 4; i++) { const h = makeCharacter(randomPerson(r)); addCollar(h, ['#c9473a', '#2f6fe0', '#3aa76d', '#f2c230'][i]); h.root.position.set(-6 + i * 4, 3.2, -11 + (i % 2) * 1.5); h.root.rotation.y = (r() - 0.5) * 0.6; scene.add(h.root); const tag = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.8), new THREE.MeshBasicMaterial({ map: V.textTex('ADOPT ME', { w: 256, h: 120, bg: '#fff6d8', fg: '#7a2a1a', font: '700 46px Arial' }) })); tag.position.set(-6 + i * 4, 3.9, -6.9); scene.add(tag); humans.push({ h, ph: r() * 6, sit: i % 2 === 1 }); }
+  D.shopStreetDressing(scene);
   const shopper = put(scene, animal.shopper(), 2.2, 0, 4.0, Math.PI);
   const kit = put(scene, makeAnimal('ginger', 'casual', { scale: 0.6 }), 4.0, 0, 3.4, Math.PI);
   scene.userData.update = (t) => {
@@ -204,6 +214,10 @@ export function buildVet(renderer) {
   table.add(V.at(V.B(6, 0.4, 3, CM('#c9ced3', { metalness: 0.6, roughness: 0.3 })), 0, 3.2, 0), V.at(V.B(1, 3, 1, CM('#9aa1a8', { metalness: 0.5 })), 0, 1.5, 0));
   const poster = new THREE.Mesh(new THREE.PlaneGeometry(4, 5.4), new THREE.MeshBasicMaterial({ map: V.textTex('HUMAN\nCARE\nGUIDE', { w: 300, h: 400, bg: '#ffffff', fg: '#2aa198', font: '700 64px Georgia, serif', border: '#2aa198' }) })); poster.position.set(-6, 7.5, -12.9); scene.add(poster);
   const chart = new THREE.Mesh(new THREE.PlaneGeometry(3, 4), new THREE.MeshBasicMaterial({ map: V.textTex('GOOD\nHUMAN\n★★★★☆', { w: 300, h: 400, bg: '#fff6d8', fg: '#7a2a1a', font: '700 54px Georgia, serif' }) })); chart.position.set(5, 7, -12.9); scene.add(chart);
+  { const r = rng(81); const bs = D.bookshelf(r, 6, 8); bs.position.set(11, 0, -12.2); scene.add(bs); const cab = D.bookshelf(r, 5, 6); cab.position.set(-12, 0, -12.2); scene.add(cab);
+    const win = D.windowView(7, 4.4); win.position.set(0, 8, -12.85); scene.add(win); const pl = D.plant(r, 1.3); pl.position.set(-15, 0, -9); scene.add(pl);
+    for (const [x, txt] of [[-16.9, 'WASH\nYOUR\nPAWS'], [16.9, 'HUMANS\nNEED\nWALKS']]) { const f = D.frame(txt, 3, 4, '#fff6d8'); f.position.set(x, 7, -2); f.rotation.y = x < 0 ? Math.PI / 2 : -Math.PI / 2; scene.add(f); }
+    const scale = new THREE.Group(); scale.add(V.at(V.B(3, 0.4, 3, CM('#c9ced3', { metalness: 0.5 })), 0, 0.2, 0), V.at(V.B(0.3, 3, 0.3, CM('#9aa1a8')), 0, 1.7, -1.2)); scale.position.set(-8, 0, 2); scene.add(scale); }
   const patient = put(scene, makeCharacter(HUMANS.patient), 0, 0.4, 0.4, 0); addCollar(patient, '#2f6fe0');
   const vet = put(scene, animal.vet(), 3.8, 0, 1.6, -1.8);
   const steth = new THREE.Group(); steth.add(V.at(V.B(0.3, 0.3, 0.12, CM('#c9ced3', { metalness: 0.7 })), 0, 0, 0)); vet.armR.hand.add(steth); steth.position.set(0, -0.4, 0.2);
@@ -230,6 +244,13 @@ export function buildLivingRoom(renderer) {
   const leaf = new THREE.Group(); leaf.position.set(0, 0, -2.3); door.add(leaf); leaf.add(V.at(V.B(0.25, 8.2, 4.6, CM('#8e3b2b')), 0, 4.1, 2.3));
   scene.add(V.at(V.B(2.4, 0.06, 3.6, CM('#c9473a', { roughness: 1 })), 12, 0.03, 4)); // doormat
   const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.55, 0.4, 16), CM('#c9473a')); bowl.position.set(9, 0.2, -10); scene.add(bowl);
+  { const r = rng(101); const bs = D.bookshelf(r, 7, 9); bs.position.set(-14, 0, -14.2); scene.add(bs);
+    const win = D.windowView(9, 5.4); win.position.set(4, 7.4, -14.85); scene.add(win);
+    for (const [x, y, txt, c] of [[-4, 8.4, 'GOOD\nDOG', '#fff6d8'], [-0.4, 9.4, 'BISCUIT\n& TOM', '#cfe3f7'], [-0.6, 6.4, '♥', '#f6d6d6']]) { const f = D.frame(txt, 2.6, 2.0, c); f.position.set(x, y, -14.85); scene.add(f); }
+    const pl = D.plant(r, 1.4); pl.position.set(17, 0, -12); scene.add(pl); const pl2 = D.plant(r, 1.1); pl2.position.set(-17, 0, 8); scene.add(pl2);
+    const fl = new THREE.Group(); fl.add(V.at(V.B(0.25, 9, 0.25, CM('#3a3f46')), 0, 4.5, 0), V.at(new THREE.Mesh(new THREE.ConeGeometry(1.2, 1.4, 12, 1, true), CM('#f4e6c8', { side: THREE.DoubleSide, emissive: '#ffcf8a', emissiveIntensity: 0.4 })), 0, 9.2, 0)); fl.position.set(-10, 0, -9); scene.add(fl);
+    const rug = new THREE.Mesh(new THREE.CircleGeometry(6, 32), CM('#3a7bd5', { roughness: 1 })); rug.rotation.x = -Math.PI / 2; rug.position.set(1, 0.03, -2); scene.add(rug);
+    const toys = [['#f2c230', 0.5], ['#e8423b', 0.4]]; toys.forEach(([c, s], i) => { const b = new THREE.Mesh(new THREE.SphereGeometry(s, 12, 8), CM(c)); b.position.set(4 + i * 2, s, 1); scene.add(b); }); }
   const bed = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, 0.8, 20), CM('#b9a07a')); bed.position.set(8, 0.4, -9); scene.add(bed);
   const nameplate = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.7), new THREE.MeshBasicMaterial({ map: V.textTex('TOM', { w: 256, h: 74, bg: '#2f6fe0', fg: '#fff', font: '700 50px Arial' }) })); nameplate.position.set(8, 1.4, -11.3); scene.add(nameplate);
   const biscuit = put(scene, animal.biscuit(), -3, 0, -6, 0);

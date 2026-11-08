@@ -8,6 +8,7 @@ import { buildCity, buildSuburb, person } from './scenes_city.js';
 import { buildStudio } from './scenes_places.js';
 import { HUMANS, animal, mixedCrowd, makeLeash, buildOffice, buildPodium, buildZoo, buildDogPark, buildPetStore, buildVet, buildLivingRoom, addSpeciesCity } from './scenes_ep2.js';
 import { makeShots, fadeAt } from './timeline.js';
+import { streetDressing } from './decor.js';
 import { updateUI } from './ui.js';
 
 const cues = await (await fetch('cues.json')).json();
@@ -24,7 +25,7 @@ const rtBoard = new THREE.WebGLRenderTarget(768, 432, { samples: 4 }); rtBoard.t
 
 const S = {};
 // the street: Tom walks Biscuit
-S.street = buildSuburb(renderer, { intact: true });
+S.street = buildSuburb(renderer, { intact: true }); streetDressing(S.street);
 { const st = S.street.userData; st.actors = { tom: person(S.street, HUMANS.tom, -30, 0.32, 3.2, Math.PI / 2), biscuit: animal.biscuit() };
   S.street.add(st.actors.biscuit.root); st.collar = addCollar(st.actors.tom); st.leash = makeLeash(S.street, '#c9473a');
   st.dome = S.street.children.find((c) => c.material?.uniforms?.cTop); }
