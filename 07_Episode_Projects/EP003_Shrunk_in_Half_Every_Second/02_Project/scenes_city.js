@@ -36,7 +36,7 @@ export function dirtMesh(w, d, cx, cz, H, seed = 1, base = '#8b6b4a') {
 }
 
 const STYLES = {
-  nyc: { cols: ['#c9b79c', '#a65d3f', '#d7cfc0', '#8e8a84', '#b8a07e', '#e2d6c0', '#7d8a96'], h: [28, 110], sky: ['#3d7cc4', '#cfe4f2', '#a8b4bc'], sunDir: v3(-0.5, 0.75, 0.6) },
+  nyc: { cols: ['#c9b79c', '#a65d3f', '#d7cfc0', '#8e8a84', '#b8a07e', '#e2d6c0', '#7d8a96'], h: [60, 270], sky: ['#3d7cc4', '#cfe4f2', '#a8b4bc'], sunDir: v3(-0.5, 0.75, 0.6) },
   tokyo: { cols: ['#e6e3dc', '#c9ccd1', '#b4bcc6', '#efe9dc', '#9aa5b1', '#d7d0c2'], h: [22, 70], sky: ['#4f86c9', '#dde9f2', '#b9c2c9'], sunDir: v3(0.4, 0.8, 0.5), signs: true },
   london: { cols: ['#9c5a40', '#b8704f', '#e8e0cf', '#8a4a35', '#d9cdb5', '#a9604a'], h: [12, 22], sky: ['#7d97b5', '#dfe5ea', '#b0b6bb'], sunDir: v3(0.3, 0.55, 0.6), chimneys: true },
   sao: { cols: ['#ece8df', '#d9d3c7', '#f2ede2', '#c9c3b7', '#e3d9c5'], h: [34, 90], sky: ['#3f7fc9', '#d6e8f4', '#b8bcae'], sunDir: v3(-0.3, 0.8, 0.4), balconies: true },
@@ -87,9 +87,9 @@ export function buildCity(renderer, opts = {}) {
     const edge = (ax, az, len, nx, nz) => { // walk along one block face; normal (nx,nz) points to the street
       let u = -len / 2 + inset;
       while (u < len / 2 - inset - 6) {
-        const lw = Math.min(10 + r() * 14, len / 2 - inset - u); if (lw < 6) break;
+        const lw = Math.min(14.4 + Math.floor(r() * 3) * 7.2, Math.floor((len / 2 - inset - u) / 7.2) * 7.2); if (lw < 14.4) break;
         const h = st.h[0] + r() * (st.h[1] - st.h[0]) * (opts.style === 'nyc' && Math.hypot(cx, cz) > 150 ? 0.6 : 1);
-        const depth = 14 + r() * 6;
+        const depth = 14.4 + (r() < 0.5 ? 7.2 : 0);
         const b = P.building(r, lw, h, depth, st.cols[Math.floor(r() * st.cols.length)]);
         const px = ax + (nz !== 0 ? u + lw / 2 : 0) - nx * (inset + depth / 2), pz = az + (nx !== 0 ? u + lw / 2 : 0) - nz * (inset + depth / 2);
         b.position.set(px, 0.3, pz); b.rotation.y = Math.atan2(nx, nz); scene.add(b); lots.push(b);
@@ -105,7 +105,7 @@ export function buildCity(renderer, opts = {}) {
     // street trees + lamps along the block edges near the middle of the city
     if (Math.abs(cx) < 140 && cz > -200) {
       for (let u = -w / 2 + 8; u < w / 2 - 6; u += rebuilt ? 9 : 16) for (const zz of [bz0 + 2.5, bz1 - 2.5]) {
-        if (rebuilt || r() < 0.5) { const tr = tree(r, rebuilt ? 1.1 : 0.9); tr.position.set(cx + u, 0.3, zz); scene.add(tr); }
+        if (rebuilt || r() < 0.5) { const tr = tree(r, rebuilt ? 2.6 : 2.4); tr.position.set(cx + u, 0.3, zz); scene.add(tr); }
       }
     }
   }
@@ -113,11 +113,11 @@ export function buildCity(renderer, opts = {}) {
   const lights = [];
   for (const sz of ST) for (const ax of [AV[1]]) {
     for (const [sx, sz2, ry] of [[1, 1, Math.PI], [-1, -1, 0]]) {
-      const tl = V.trafficLight(9); tl.position.set(ax + sx * (AW / 2 + 1.2), 0.3, sz + sz2 * (SW / 2 + 1.2)); tl.rotation.y = ry + (sx > 0 ? -Math.PI / 2 : Math.PI / 2) * 0; scene.add(tl); lights.push(tl);
+      const tl = V.trafficLight(9); tl.scale.setScalar(1.5); tl.position.set(ax + sx * (AW / 2 + 1.2), 0.3, sz + sz2 * (SW / 2 + 1.2)); tl.rotation.y = ry + (sx > 0 ? -Math.PI / 2 : Math.PI / 2) * 0; scene.add(tl); lights.push(tl);
       tl.rotation.y = sx > 0 ? Math.PI : 0;
     }
   }
-  for (const sz of ST) for (const ax of AV) for (const [dx, dz] of [[1, 1], [-1, -1]]) { const l = V.streetLamp(); l.position.set(ax + dx * (AW / 2 + 1.5), 0.3, sz + dz * (SW / 2 + 9)); l.rotation.y = dx > 0 ? Math.PI : 0; scene.add(l); }
+  for (const sz of ST) for (const ax of AV) for (const [dx, dz] of [[1, 1], [-1, -1]]) { const l = V.streetLamp(); l.scale.setScalar(2.2); l.position.set(ax + dx * (AW / 2 + 1.5), 0.3, sz + dz * (SW / 2 + 9)); l.rotation.y = dx > 0 ? Math.PI : 0; scene.add(l); }
 
   // ---------------- traffic on the main avenue (lanes run along z) + cross street at z = 0
   const vehicles = [];

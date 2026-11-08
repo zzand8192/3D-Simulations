@@ -203,6 +203,7 @@ shot('reporter', {
 | The news ticker or bar sits outside the safe area | Bar top 1296 px, ticker top 1452 px |
 | Faces are hidden behind props or hands | Watch for poses where a hand covers the face (e.g. hand-on-chin near the camera) |
 | Text in the world (signs, monitors) | Draw it with `canvasTex`; keep names fictional |
+| People look too big next to buildings (a person taller than a storey) | **Scale: 3 units = 1 m; a person is 5.4 units (1.8 m).** Storeys are 9.6 units (3.2 m), window bays 7.2 (2.4 m), shop fronts 12.9 (4.3 m), street trees about 20 units, lamps about 20 units. `src/props.js` and EP003's `scenes_city.js` use these; EP001/EP002 predate the fix |
 
 ## 8. Environment notes (Claude Code cloud container)
 - `export NODE_PATH=/opt/node22/lib/node_modules` lets the global Playwright and Chromium work; don't run `playwright install`.

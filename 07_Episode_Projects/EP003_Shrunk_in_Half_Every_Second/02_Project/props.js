@@ -80,7 +80,7 @@ const FACADES = ['#f1d9a8', '#f3b27a', '#e9e2cf', '#d98c5f', '#f6e7b0', '#cfd8d6
 // ---------------------------------------------------------------- buildings (rebuilt)
 // Facades tile ONE window bay at a fixed world size (BAY wide × FLOOR tall), so windows are the same size on
 // every face of every building and never stretch. Textures are tiny, sharp, mipmapped and shared per colour.
-const BAY = 3.0, FLOOR = 3.4;
+const BAY = 7.2, FLOOR = 9.6; // 2.4 m bays, 3.2 m storeys (3 units = 1 m, people are 5.4 units = 1.8 m)
 const TILE_CACHE = new Map();
 function bayTexture(color, variant) {
   const key = color + '|' + variant;
@@ -115,7 +115,7 @@ export function building(r, w, h, d, color) {
   color = color || FACADES[Math.floor(r() * FACADES.length)];
   // snap the size to whole bays/floors so windows end cleanly at corners and at the roof
   w = Math.max(2, Math.floor(w / BAY)) * BAY; d = Math.max(2, Math.floor(d / BAY)) * BAY;
-  const shopH = FLOOR * 1.25, floors = Math.max(2, Math.round((h - shopH) / FLOOR)); h = shopH + floors * FLOOR;
+  const shopH = 12.9, floors = Math.max(2, Math.round((h - shopH) / FLOOR)); h = shopH + floors * FLOOR; // 4.3 m ground floor
   const variant = Math.floor(r() * 3);
   const facade = matFor(bayTexture(color, variant), color + variant), roofM = plain('#d9d4c9');
   const g = new THREE.Group();
@@ -125,17 +125,17 @@ export function building(r, w, h, d, color) {
   const shopM = matFor(SHOP_TEX(), 'shop'), baseM = plain(color);
   const shop = new THREE.Mesh(tiledBox(w - 0.2, shopH, d - 0.2, BAY, shopH), [shopM, shopM, baseM, baseM, shopM, shopM]); shop.position.y = shopH / 2; shop.castShadow = shop.receiveShadow = true; g.add(shop);
   const trim = ['#2f6fe0', '#c9473a', '#3aa76d', '#2b2f36', '#f2b230', '#8e5bd6'][Math.floor(r() * 6)];
-  g.add(at(box(w + 0.3, 0.5, d + 0.3, plain(trim)), 0, shopH, 0));
+  g.add(at(box(w + 0.4, 1.2, d + 0.4, plain(trim)), 0, shopH, 0));
   // roof: parapet + rooftop details
   const par = plain('#e8e1d3');
-  g.add(at(box(w + 0.4, 0.9, 0.4, par), 0, h + 0.45, d / 2), at(box(w + 0.4, 0.9, 0.4, par), 0, h + 0.45, -d / 2), at(box(0.4, 0.9, d, par), w / 2, h + 0.45, 0), at(box(0.4, 0.9, d, par), -w / 2, h + 0.45, 0));
+  g.add(at(box(w + 0.6, 3.0, 0.6, par), 0, h + 1.5, d / 2), at(box(w + 0.6, 3.0, 0.6, par), 0, h + 1.5, -d / 2), at(box(0.6, 3.0, d, par), w / 2, h + 1.5, 0), at(box(0.6, 3.0, d, par), -w / 2, h + 1.5, 0));
   g.add(at(box(w - 0.2, 0.1, d - 0.2, roofM), 0, h + 0.05, 0));
   const n = 1 + Math.floor(r() * 3);
   for (let i = 0; i < n; i++) {
     const kind = r();
-    if (kind < 0.4) g.add(at(box(2.2, 1.4, 1.6, plain('#b9bfc6')), (r() - 0.5) * (w - 4), h + 0.8, (r() - 0.5) * (d - 4)));          // AC unit
-    else if (kind < 0.7 && h > 25) { const tank = new THREE.Group(); tank.add(at(new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, 2.6, 10), plain('#8a6a45')), 0, 2.9, 0)); tank.add(at(new THREE.Mesh(new THREE.ConeGeometry(1.5, 0.9, 10), plain('#6b5038')), 0, 4.6, 0)); for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) tank.add(at(box(0.15, 1.6, 0.15, plain('#555')), x, 0.8, z)); tank.position.set((r() - 0.5) * (w - 4), h, (r() - 0.5) * (d - 4)); g.add(tank); }
-    else g.add(at(box(w * 0.28, 2.0, d * 0.28, plain('#cfc8bb')), (r() - 0.5) * w * 0.4, h + 1.0, (r() - 0.5) * d * 0.4)); // stair/elevator housing
+    if (kind < 0.4) g.add(at(box(4.8, 3.6, 3.6, plain('#b9bfc6')), (r() - 0.5) * (w - 7), h + 1.8, (r() - 0.5) * (d - 7)));          // AC unit
+    else if (kind < 0.7 && h > 60) { const tank = new THREE.Group(); tank.scale.setScalar(2.6); tank.add(at(new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, 2.6, 10), plain('#8a6a45')), 0, 2.9, 0)); tank.add(at(new THREE.Mesh(new THREE.ConeGeometry(1.5, 0.9, 10), plain('#6b5038')), 0, 4.6, 0)); for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) tank.add(at(box(0.15, 1.6, 0.15, plain('#555')), x, 0.8, z)); tank.position.set((r() - 0.5) * (w - 9), h, (r() - 0.5) * (d - 9)); g.add(tank); }
+    else g.add(at(box(w * 0.3, 7.5, d * 0.3, plain('#cfc8bb')), (r() - 0.5) * w * 0.35, h + 3.75, (r() - 0.5) * d * 0.35)); // stair/elevator housing
   }
   g.userData.height = h;
   return g;

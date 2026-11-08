@@ -116,7 +116,7 @@ export function buildWorld(renderer) {
   for (const c of [...city.children]) { if (c.isLight || c === C.dome) continue; cityG.add(c); }
   const G0 = v3(12.9, 0.3, 30); // Greg's spot: on the sidewalk by the curb, mid-block
   for (const q of C.vehicles) if (!q.parked && (q.x === 3 || q.x === 9)) q.v.visible = false; // keep the near lanes clear for the camera
-  for (const p of C.peds) if (p.x > 0) p.x = Math.max(p.x, 14.4);
+  for (const p of C.peds) if (p.x > 0) p.x = Math.max(p.x, 15.6);
   let plat = null;
   cityG.traverse((o) => { if (o.isMesh && o.geometry?.parameters?.height === 2.6) { o.geometry.computeBoundingBox(); const b = o.geometry.boundingBox.clone().translate(o.position); if (G0.x > b.min.x && G0.x < b.max.x && G0.z > b.min.z && G0.z < b.max.z) plat = o; } });
   const concrete = zoomConcrete(); if (plat) { plat.material = [...plat.material]; plat.material[2] = concrete; }
