@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What If Humans and Animals Swapped Places?</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <div id="grade"></div>
+  <div id="vignette"></div>
+  <div id="news">
+    <div class="bug"><b>W24</b><span>LIVE</span></div>
+    <div class="bar">
+      <div class="tag">BREAKING NEWS</div>
+      <div class="head">ANIMALS TAKE CHARGE WORLDWIDE</div>
+      <div class="place"></div>
+    </div>
+    <div class="ticker"><span>DOGS SWORN IN AS POLICE IN 140 COUNTRIES &nbsp;•&nbsp; CATS CONFIRM NAPS REMAIN NON-NEGOTIABLE &nbsp;•&nbsp; HUMANS ADVISED TO STAY CALM AND WAIT TO BE WALKED &nbsp;•&nbsp; LION ADDRESSES WORLD LEADERS &nbsp;•&nbsp; ZOOS REPORT REVERSED VISITOR NUMBERS &nbsp;•&nbsp; DOGS SWORN IN AS POLICE IN 140 COUNTRIES &nbsp;•&nbsp; CATS CONFIRM NAPS REMAIN NON-NEGOTIABLE &nbsp;•&nbsp; HUMANS ADVISED TO STAY CALM AND WAIT TO BE WALKED &nbsp;•&nbsp;</span></div>
+  </div>
+  <div id="ui">
+    <h1 id="title"></h1>
+    <div id="label"><span class="k"></span><span class="v"></span></div>
+  </div>
+  <div id="bubbles"></div>
+  <div id="fade"></div>
+</div>
+<div id="controls" hidden>
+  <button id="play">Pause</button>
+  <input id="scrub" type="range" min="0" step="0.01" value="0">
+  <span id="clock">0.0s</span>
+</div>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+<script type="module" src="main.js"></script>
+</body>
+</html>

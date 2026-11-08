@@ -1,0 +1,45 @@
+{
+  "episode": "EP002",
+  "duration": 93,
+  "title": { "text": "What if humans and animals swapped places?", "start": 0.3, "hold": 3.0, "morph": 4.8 },
+  "labels": [
+    { "start": 3.6, "end": 12.4, "k": "DAY #1", "v": "THE SWAP" },
+    { "start": 12.9, "end": 25.4, "k": "MINUTES LATER", "v": "A NEW ORDER" },
+    { "start": 25.9, "end": 37.6, "k": "BREAKING NEWS", "v": "ANIMALS IN CHARGE" },
+    { "start": 38.2, "end": 43.0, "k": "DAY #1", "v": "SYDNEY, AUSTRALIA" },
+    { "start": 52.0, "end": 64.6, "k": "DAY #3", "v": "LEARNING NEW ROLES" },
+    { "start": 65.2, "end": 77.0, "k": "MONTH #6", "v": "CITIES FOR EVERY SPECIES" },
+    { "start": 77.6, "end": 86.6, "k": "YEAR #3", "v": "SOME THINGS NEVER CHANGE" }
+  ],
+  "subs": [
+    { "id": "dog1", "start": 7.6, "end": 10.2, "who": "biscuit", "text": "Alright. My turn to walk you." },
+    { "id": "tom1", "start": 10.4, "end": 12.4, "who": "tom", "text": "Wait… what?" },
+    { "id": "pol1", "start": 13.1, "end": 16.4, "who": "police", "text": "Ma’am, where’s your owner?" },
+    { "id": "ceo1", "start": 18.8, "end": 21.0, "who": "ceo", "text": "This is my desk now." },
+    { "id": "lion1", "start": 21.7, "end": 25.2, "who": "lion", "text": "The pride will now take questions." },
+    { "id": "anc1", "start": 26.0, "end": 29.0, "who": "anchor", "text": "Breaking news. Animals around the world have taken control" },
+    { "id": "anc2", "start": 29.1, "end": 32.3, "who": "anchor", "text": "of cities, businesses and governments." },
+    { "id": "kang1", "start": 43.4, "end": 46.7, "who": "keeper", "text": "Mate, you’re one of the exhibits now." },
+    { "id": "greg1", "start": 48.4, "end": 51.3, "who": "greg", "text": "I was literally just visiting." },
+    { "id": "park1", "start": 54.4, "end": 55.9, "who": "parkdog", "text": "Good boy!" },
+    { "id": "shop1", "start": 57.0, "end": 60.1, "who": "shopper", "text": "Aww, this one waves!" },
+    { "id": "vet1", "start": 61.0, "end": 64.4, "who": "vet", "text": "Who’s a good patient?" },
+    { "id": "anc3", "start": 70.4, "end": 74.8, "who": "anchor", "text": "Six months later, cities have been rebuilt for every species." },
+    { "id": "tom2", "start": 78.4, "end": 81.4, "who": "tom", "text": "Please? Just around the block?" },
+    { "id": "dog2", "start": 85.4, "end": 87.3, "who": "biscuit", "text": "Fine. Five minutes." }
+  ],
+  "news": [
+    { "start": 25.6, "end": 32.6, "place": "WORLD 24 · NEWSROOM", "head": "ANIMALS TAKE CHARGE WORLDWIDE" },
+    { "start": 32.6, "end": 35.2, "place": "LIVE · TOKYO, JAPAN", "head": "ANIMALS TAKE CHARGE WORLDWIDE" },
+    { "start": 35.2, "end": 37.8, "place": "LIVE · LONDON, UNITED KINGDOM", "head": "ANIMALS TAKE CHARGE WORLDWIDE" }
+  ],
+  "shots": {
+    "opening": [0, 5.0], "swap": [5.0, 12.6],
+    "police": [12.6, 16.8], "office": [16.8, 21.2], "podium": [21.2, 25.6],
+    "studio": [25.6, 32.6], "tokyo": [32.6, 35.2], "london": [35.2, 37.8],
+    "zooRead": [37.8, 43.2], "zooTalk": [43.2, 47.0], "zooReveal": [47.0, 51.6],
+    "dogpark": [51.6, 56.0], "petstore": [56.0, 60.4], "vet": [60.4, 64.8],
+    "aerial6": [64.8, 70.0], "billboard": [70.0, 77.2],
+    "living": [77.2, 87.4], "walkout": [87.4, 93]
+  }
+}
