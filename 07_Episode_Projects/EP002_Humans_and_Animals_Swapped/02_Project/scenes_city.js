@@ -93,10 +93,11 @@ export function buildCity(renderer, opts = {}) {
         const b = P.building(r, lw, h, depth, st.cols[Math.floor(r() * st.cols.length)]);
         const px = ax + (nz !== 0 ? u + lw / 2 : 0) - nx * (inset + depth / 2), pz = az + (nx !== 0 ? u + lw / 2 : 0) - nz * (inset + depth / 2);
         b.position.set(px, 0.3, pz); b.rotation.y = Math.atan2(nx, nz); scene.add(b); lots.push(b);
+        const bh = b.userData.height || h;
         if (st.signs && r() < 0.6) { const sg = V.B(1.6, 6 + r() * 6, 0.4, causticMaterial({ color: BRIGHT[Math.floor(r() * BRIGHT.length)], emissive: '#ffffff', emissiveIntensity: 0.08 })); sg.position.set(lw / 2 - 1.2, 10 + r() * 8, depth / 2 + 0.6); b.add(sg); }
-        if (st.chimneys) for (let k = 0; k < 2; k++) b.add(V.at(V.B(1.2, 2.6, 1.2, causticMaterial({ color: '#8a4a35' })), -lw / 4 + k * lw / 2, h + 1.3, 0));
-        if (st.balconies) for (let y = 6; y < h - 4; y += 5) b.add(V.at(V.B(lw * 0.8, 0.3, 1.4, causticMaterial({ color: '#f4f2ec' })), 0, y, depth / 2 + 0.7));
-        if (rebuilt && r() < 0.35) b.add(V.at(V.B(lw - 1, 0.8, depth - 1, causticMaterial({ color: '#5f9a4a' })), 0, h + 0.5, 0)); // green roof
+        if (st.chimneys) for (let k = 0; k < 2; k++) b.add(V.at(V.B(1.2, 2.6, 1.2, causticMaterial({ color: '#8a4a35' })), -lw / 4 + k * lw / 2, bh + 1.3, 0));
+        if (st.balconies) for (let y = 6.8; y < bh - 4; y += 3.4) b.add(V.at(V.B(lw * 0.8, 0.3, 1.4, causticMaterial({ color: '#f4f2ec' })), 0, y, depth / 2 + 0.7));
+        if (rebuilt && r() < 0.35) b.add(V.at(V.B(lw - 2, 0.6, depth - 2, causticMaterial({ color: '#5f9a4a' })), 0, bh + 0.4, 0)); // green roof
         u += lw + 0.4;
       }
     };

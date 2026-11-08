@@ -93,10 +93,11 @@ export function buildCity(renderer, opts = {}) {
         const b = P.building(r, lw, h, depth, st.cols[Math.floor(r() * st.cols.length)]);
         const px = ax + (nz !== 0 ? u + lw / 2 : 0) - nx * (inset + depth / 2), pz = az + (nx !== 0 ? u + lw / 2 : 0) - nz * (inset + depth / 2);
         b.position.set(px, 0.3, pz); b.rotation.y = Math.atan2(nx, nz); scene.add(b); lots.push(b);
+        const bh = b.userData.height || h;
         if (st.signs && r() < 0.6) { const sg = V.B(1.6, 6 + r() * 6, 0.4, causticMaterial({ color: BRIGHT[Math.floor(r() * BRIGHT.length)], emissive: '#ffffff', emissiveIntensity: 0.08 })); sg.position.set(lw / 2 - 1.2, 10 + r() * 8, depth / 2 + 0.6); b.add(sg); }
-        if (st.chimneys) for (let k = 0; k < 2; k++) b.add(V.at(V.B(1.2, 2.6, 1.2, causticMaterial({ color: '#8a4a35' })), -lw / 4 + k * lw / 2, h + 1.3, 0));
-        if (st.balconies) for (let y = 6; y < h - 4; y += 5) b.add(V.at(V.B(lw * 0.8, 0.3, 1.4, causticMaterial({ color: '#f4f2ec' })), 0, y, depth / 2 + 0.7));
-        if (rebuilt && r() < 0.35) b.add(V.at(V.B(lw - 1, 0.8, depth - 1, causticMaterial({ color: '#5f9a4a' })), 0, h + 0.5, 0)); // green roof
+        if (st.chimneys) for (let k = 0; k < 2; k++) b.add(V.at(V.B(1.2, 2.6, 1.2, causticMaterial({ color: '#8a4a35' })), -lw / 4 + k * lw / 2, bh + 1.3, 0));
+        if (st.balconies) for (let y = 6.8; y < bh - 4; y += 3.4) b.add(V.at(V.B(lw * 0.8, 0.3, 1.4, causticMaterial({ color: '#f4f2ec' })), 0, y, depth / 2 + 0.7));
+        if (rebuilt && r() < 0.35) b.add(V.at(V.B(lw - 2, 0.6, depth - 2, causticMaterial({ color: '#5f9a4a' })), 0, bh + 0.4, 0)); // green roof
         u += lw + 0.4;
       }
     };
@@ -159,7 +160,8 @@ export function buildCity(renderer, opts = {}) {
   // pedestrians on the sidewalks + a few crossing
   const peds = [];
   for (let i = 0; i < (opts.peds ?? 46); i++) {
-    const side = r() < 0.5 ? -1 : 1, c = person(scene, randomPerson(r), 0, 0.3, 0);
+    const side = r() < 0.5 ? -1 : 1, c = opts.pedFactory ? opts.pedFactory(r, i) : person(scene, randomPerson(r), 0, 0.3, 0);
+    if (opts.pedFactory) scene.add(c.root);
     peds.push({ c, x: ax + side * (AW / 2 + 1.6 + r() * 3.2), z0: -150 + r() * 260, sp: (r() < 0.5 ? 1 : -1) * (2.8 + r()), ph: r() * 6, react: r(), stand: r() < 0.25 });
   }
   const crossers = [];
@@ -171,7 +173,7 @@ export function buildCity(renderer, opts = {}) {
       const z = ((p.z0 + p.sp * (p.stand ? 0 : stopT) + 170) % 300 + 300) % 300 - 170;
       const walking = !p.stand && !(goneNow && (tv < 0 || t > tv + 0.4));
       p.c.root.position.set(p.x, 0.3, z);
-      if (walking) { p.c.root.rotation.y = p.sp > 0 ? 0 : Math.PI; p.c.pose(motion.walk(t, 0.85, p.ph)); p.c.setFace({ eyes: 'open', mouth: 'smile' }, t, false, p.ph); }
+      if (walking) { p.c.root.rotation.y = p.sp > 0 ? 0 : Math.PI; p.c.pose(motion.walk(t, 0.85, p.ph)); p.c.setFace(p.c.isAnimal ? { eyes: 'open' } : opts.humanFace || { eyes: 'open', mouth: 'smile' }, t, p.c.isAnimal && Math.sin(t * 0.7 + p.ph) > 0.6, p.ph); p.c.wag?.(t, 0.6); }
       else if (goneNow && !rebuilt) {
         const toRoad = p.x > ax ? -Math.PI / 2 : Math.PI / 2;
         const k = tv >= 0 ? THREE.MathUtils.smoothstep(t, tv + 0.2 + p.react * 0.6, tv + 0.7 + p.react * 0.6) : 1;
@@ -241,7 +243,7 @@ export function tree(r, s = 1) {
 }
 
 // ============================================================= residential street (road already gone)
-export function buildSuburb(renderer) {
+export function buildSuburb(renderer, opts = {}) {
   const scene = new THREE.Scene(); const r = rng(21);
   const sunDir = v3(0.5, 0.7, 0.6);
   scene.add(gradientDome({ top: '#3d7cc4', mid: '#d4e8f4', bottom: '#9fb08a', sunDir, sunColor: '#fff2d6', sunSize: 0.03 }));
@@ -251,6 +253,8 @@ export function buildSuburb(renderer) {
   scene.add(new THREE.HemisphereLight('#cfe3f7', '#7f8f60', 1.0));
   const H = (x, z) => -0.95 + Math.sin(x * 0.17) * 0.18 + Math.cos(z * 0.6 + x * 0.05) * 0.08;
   scene.add(dirtMesh(400, 14, 0, 12, H, 5));                               // the strip where the street was
+  if (opts.intact) { const road = new THREE.Mesh(new THREE.PlaneGeometry(400, 13), causticMaterial({ color: '#3e4146', roughness: 0.9 })); road.rotation.x = -Math.PI / 2; road.position.set(0, 0.02, 12); road.receiveShadow = true; scene.add(road);
+    for (let x = -200; x < 200; x += 10) { const s = new THREE.Mesh(new THREE.PlaneGeometry(5, 0.25), causticMaterial({ color: '#e8c33a' })); s.rotation.x = -Math.PI / 2; s.position.set(x, 0.05, 12); scene.add(s); } }
   const grass = causticMaterial({ color: '#6fa04f', roughness: 1 }), side = causticMaterial({ color: '#c4c0b8', roughness: 0.9 }), curb = causticMaterial({ color: '#a19d95' });
   for (const [z, d] of [[-14, 30], [38, 30]]) { const g = new THREE.Mesh(new THREE.BoxGeometry(400, 2.6, d), [curb, curb, grass, curb, curb, curb]); g.position.set(0, -1.0, z); g.receiveShadow = true; scene.add(g); }
   for (const z of [3.5, 20.5]) { const s = new THREE.Mesh(new THREE.BoxGeometry(400, 2.62, 5), [curb, curb, side, curb, curb, curb]); s.position.set(0, -0.99, z); s.receiveShadow = true; scene.add(s); }
@@ -268,15 +272,16 @@ export function buildSuburb(renderer) {
     const doorPivot = new THREE.Group(); doorPivot.position.set(-1.25, 0, 6.05); g.add(doorPivot);
     doorPivot.add(V.at(V.B(2.5, 5.2, 0.25, causticMaterial({ color: ['#8e3b2b', '#2f4f8c', '#3a6b4a'][(i + 9) % 3] })), 1.25, 2.6, 0));
     g.userData.door = doorPivot;
-    const mb = new THREE.Group(); mb.add(V.at(V.B(0.25, 3, 0.25, causticMaterial({ color: '#555' })), 0, 1.5, 0), V.at(V.B(1, 0.8, 1.4, causticMaterial({ color: '#2b2d31' }), 0.2), 0, 3.2, 0)); mb.position.set(i * 22 + 4, 0.3, 4.5); scene.add(mb);
+    if (!opts.intact) { const mb = new THREE.Group(); mb.add(V.at(V.B(0.25, 3, 0.25, causticMaterial({ color: '#555' })), 0, 1.5, 0), V.at(V.B(1, 0.8, 1.4, causticMaterial({ color: '#2b2d31' }), 0.2), 0, 3.2, 0)); mb.position.set(i * 22 + 4, 0.3, 4.5); scene.add(mb); }
     if (r() < 0.7) { const t = tree(r, 1.2); t.position.set(i * 22 + 9, 0.3, -2); scene.add(t); }
   }
   // parked cars stranded where the curbside used to be + a basketball hoop, bins
-  for (let i = 0; i < 6; i++) { const v = V.car(CARCOLS[Math.floor(r() * CARCOLS.length)], r() < 0.4 ? 'suv' : 'sedan'); const x = -70 + i * 26 + r() * 6; v.position.set(x, H(x, 8) + 0.1, 8); v.rotation.y = Math.PI / 2; v.userData.body.rotation.z = 0.03; scene.add(v); }
+  if (!opts.intact) for (let i = 0; i < 6; i++) { const v = V.car(CARCOLS[Math.floor(r() * CARCOLS.length)], r() < 0.4 ? 'suv' : 'sedan'); const x = -70 + i * 26 + r() * 6; v.position.set(x, opts.intact ? 0.02 : H(x, 8) + 0.1, 8); v.rotation.y = Math.PI / 2; v.userData.body.rotation.z = opts.intact ? 0 : 0.03; scene.add(v); }
   const owner = person(scene, { name: 'homeowner', skin: '#c68e6a', hair: '#1a120c', hairStyle: 'buzz', top: { kind: 'tee', color: '#8e5bd6', trim: '#ffffff' }, bottom: { color: '#5d6b7a' }, shoes: '#2a2c31', beard: '#2a1a12' }, 0, 0.3, -12);
   const mug = P.cup('#f2f2f2'); owner.armL.hand.add(mug); mug.position.set(0, -0.45, 0.2); mug.scale.setScalar(1.4);
   const neighbors = [];
-  for (let i = 0; i < 4; i++) { const c = person(scene, randomPerson(r), -60 + i * 38 + r() * 8, 0.3, 3 + r() * 1.5, 0); neighbors.push({ c, ph: r() * 6, react: r() }); }
+  if (!opts.intact) for (let i = 0; i < 4; i++) { const c = person(scene, randomPerson(r), -60 + i * 38 + r() * 8, 0.3, 3 + r() * 1.5, 0); neighbors.push({ c, ph: r() * 6, react: r() }); }
+  owner.root.visible = !opts.intact;
   scene.userData.update = (t) => {
     for (const n of neighbors) { n.c.root.rotation.y = 0; n.c.pose(mergePose(motion.idle(t, 1, n.ph), n.react < 0.5 ? motion.lookDown : motion.phone)); n.c.setFace({ eyes: 'wide', mouth: 'small-o', brows: 'up' }, t, false, n.ph); }
   };

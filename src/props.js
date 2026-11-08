@@ -77,26 +77,67 @@ export function palm(r, h = 9) {
   return g;
 }
 const FACADES = ['#f1d9a8', '#f3b27a', '#e9e2cf', '#d98c5f', '#f6e7b0', '#cfd8d6', '#e8a07a'];
+// ---------------------------------------------------------------- buildings (rebuilt)
+// Facades tile ONE window bay at a fixed world size (BAY wide × FLOOR tall), so windows are the same size on
+// every face of every building and never stretch. Textures are tiny, sharp, mipmapped and shared per colour.
+const BAY = 3.0, FLOOR = 3.4;
+const TILE_CACHE = new Map();
+function bayTexture(color, variant) {
+  const key = color + '|' + variant;
+  if (TILE_CACHE.has(key)) return TILE_CACHE.get(key);
+  const t = canvasTex(64, 72, (g, W, H) => {
+    g.fillStyle = color; g.fillRect(0, 0, W, H);
+    g.fillStyle = 'rgba(0,0,0,.06)'; g.fillRect(0, H - 6, W, 6);                       // floor line
+    const wx = 14, wy = 14, ww = 36, wh = 40;
+    g.fillStyle = '#f4f1ea'; g.fillRect(wx - 3, wy - 3, ww + 6, wh + 6);                 // frame
+    const gr = g.createLinearGradient(0, wy, 0, wy + wh); gr.addColorStop(0, '#9fbad0'); gr.addColorStop(0.5, '#4f6a82'); gr.addColorStop(1, '#34495c');
+    g.fillStyle = gr; g.fillRect(wx, wy, ww, wh);                                        // glass with sky reflection
+    if (variant === 1) { g.fillStyle = '#e9e2cf'; g.fillRect(wx, wy, ww, wh * 0.45); }    // half-drawn blind
+    if (variant === 2) { g.fillStyle = 'rgba(255,214,140,.55)'; g.fillRect(wx, wy + wh * 0.3, ww, wh * 0.7); } // warm interior
+    g.fillStyle = '#f4f1ea'; g.fillRect(wx + ww / 2 - 1.5, wy, 3, wh); g.fillRect(wx, wy + wh * 0.42, ww, 3); // mullions
+    g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(wx - 4, wy + wh + 3, ww + 8, 4);          // sill shadow
+  });
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 8; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter;
+  TILE_CACHE.set(key, t); return t;
+}
+const SHOP_TEX = (() => { let t = null; return () => t || (t = (() => { const x = canvasTex(64, 64, (g, W, H) => { g.fillStyle = '#2b2f36'; g.fillRect(0, 0, W, H); const gr = g.createLinearGradient(0, 8, 0, H); gr.addColorStop(0, '#7f9cb4'); gr.addColorStop(1, '#2f4152'); g.fillStyle = gr; g.fillRect(4, 8, W - 8, H - 12); g.fillStyle = '#2b2f36'; g.fillRect(W / 2 - 1.5, 8, 3, H - 12); }); x.wrapS = x.wrapT = THREE.RepeatWrapping; x.anisotropy = 8; return x; })()); })();
+const MAT_CACHE = new Map();
+const matFor = (tex, key) => { if (!MAT_CACHE.has(key)) MAT_CACHE.set(key, M('#ffffff', { map: tex, roughness: 0.75 })); return MAT_CACHE.get(key); };
+// box geometry whose side-face UVs are in "bays" and "floors" (so a repeating tile keeps a fixed world size)
+function tiledBox(w, h, d, bay = BAY, floor = FLOOR) {
+  const geo = new THREE.BoxGeometry(w, h, d), uv = geo.attributes.uv;
+  const dims = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];             // +x -x +y -y +z -z
+  for (let f = 0; f < 6; f++) for (let k = 0; k < 4; k++) { const i = f * 4 + k; uv.setXY(i, uv.getX(i) * dims[f][0] / bay, uv.getY(i) * dims[f][1] / floor); }
+  return geo;
+}
+const PLAIN = new Map(); const plain = (c) => { if (!PLAIN.has(c)) PLAIN.set(c, M(c, { roughness: 0.85 })); return PLAIN.get(c); };
 export function building(r, w, h, d, color) {
   color = color || FACADES[Math.floor(r() * FACADES.length)];
-  const floors = Math.max(2, Math.round(h / 3.4)), cols = Math.max(2, Math.round(w / 2.6));
-  const tex = canvasTex(256, 512, (g, W, H) => {
-    g.fillStyle = color; g.fillRect(0, 0, W, H);
-    const fw = W / cols, fh = H / floors;
-    for (let y = 0; y < floors; y++) for (let x = 0; x < cols; x++) {
-      const px = x * fw + fw * 0.2, py = y * fh + fh * 0.22, ww = fw * 0.6, hh = fh * 0.56;
-      g.fillStyle = '#f7f4ec'; g.fillRect(px - 3, py - 3, ww + 6, hh + 6);
-      g.fillStyle = r() < 0.7 ? '#3f5466' : '#5b7286'; g.fillRect(px, py, ww, hh);
-      g.fillStyle = '#f7f4ec'; g.fillRect(px + ww / 2 - 1.5, py, 3, hh); g.fillRect(px, py + hh * 0.4, ww, 3);
-      if (r() < 0.35) { g.fillStyle = 'rgba(40,30,30,.55)'; g.fillRect(px - 4, py + hh + 2, ww + 8, 5); }
-    }
-    g.fillStyle = 'rgba(0,0,0,.12)'; g.fillRect(0, H - fh * 0.9, W, fh * 0.9);
-  });
+  // snap the size to whole bays/floors so windows end cleanly at corners and at the roof
+  w = Math.max(2, Math.floor(w / BAY)) * BAY; d = Math.max(2, Math.floor(d / BAY)) * BAY;
+  const shopH = FLOOR * 1.25, floors = Math.max(2, Math.round((h - shopH) / FLOOR)); h = shopH + floors * FLOOR;
+  const variant = Math.floor(r() * 3);
+  const facade = matFor(bayTexture(color, variant), color + variant), roofM = plain('#d9d4c9');
   const g = new THREE.Group();
-  const mats = [M('#ffffff', { map: tex }), M('#ffffff', { map: tex }), M(color), M(color), M('#ffffff', { map: tex }), M('#ffffff', { map: tex })];
-  const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mats); b.position.y = h / 2; b.castShadow = b.receiveShadow = true; g.add(b);
-  g.add(at(box(w + 0.4, 0.5, d + 0.4, M('#e8e1d3')), 0, h + 0.25, 0));
-  if (r() < 0.5) g.add(at(box(w * 0.3, 1.6, d * 0.3, M('#d8d1c3')), (r() - 0.5) * w * 0.4, h + 1.2, 0));
+  const upper = new THREE.Mesh(tiledBox(w, floors * FLOOR, d), [facade, facade, roofM, roofM, facade, facade]);
+  upper.position.y = shopH + floors * FLOOR / 2; upper.castShadow = upper.receiveShadow = true; g.add(upper);
+  // ground-floor storefront band + a colour trim band
+  const shopM = matFor(SHOP_TEX(), 'shop'), baseM = plain(color);
+  const shop = new THREE.Mesh(tiledBox(w - 0.2, shopH, d - 0.2, BAY, shopH), [shopM, shopM, baseM, baseM, shopM, shopM]); shop.position.y = shopH / 2; shop.castShadow = shop.receiveShadow = true; g.add(shop);
+  const trim = ['#2f6fe0', '#c9473a', '#3aa76d', '#2b2f36', '#f2b230', '#8e5bd6'][Math.floor(r() * 6)];
+  g.add(at(box(w + 0.3, 0.5, d + 0.3, plain(trim)), 0, shopH, 0));
+  // roof: parapet + rooftop details
+  const par = plain('#e8e1d3');
+  g.add(at(box(w + 0.4, 0.9, 0.4, par), 0, h + 0.45, d / 2), at(box(w + 0.4, 0.9, 0.4, par), 0, h + 0.45, -d / 2), at(box(0.4, 0.9, d, par), w / 2, h + 0.45, 0), at(box(0.4, 0.9, d, par), -w / 2, h + 0.45, 0));
+  g.add(at(box(w - 0.2, 0.1, d - 0.2, roofM), 0, h + 0.05, 0));
+  const n = 1 + Math.floor(r() * 3);
+  for (let i = 0; i < n; i++) {
+    const kind = r();
+    if (kind < 0.4) g.add(at(box(2.2, 1.4, 1.6, plain('#b9bfc6')), (r() - 0.5) * (w - 4), h + 0.8, (r() - 0.5) * (d - 4)));          // AC unit
+    else if (kind < 0.7 && h > 25) { const tank = new THREE.Group(); tank.add(at(new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, 2.6, 10), plain('#8a6a45')), 0, 2.9, 0)); tank.add(at(new THREE.Mesh(new THREE.ConeGeometry(1.5, 0.9, 10), plain('#6b5038')), 0, 4.6, 0)); for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) tank.add(at(box(0.15, 1.6, 0.15, plain('#555')), x, 0.8, z)); tank.position.set((r() - 0.5) * (w - 4), h, (r() - 0.5) * (d - 4)); g.add(tank); }
+    else g.add(at(box(w * 0.28, 2.0, d * 0.28, plain('#cfc8bb')), (r() - 0.5) * w * 0.4, h + 1.0, (r() - 0.5) * d * 0.4)); // stair/elevator housing
+  }
+  g.userData.height = h;
   return g;
 }
 export function seagull() {
