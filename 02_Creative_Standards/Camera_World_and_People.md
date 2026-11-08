@@ -1,10 +1,15 @@
 # Camera, world, and people
 
+## Character style (the only allowed style)
+
+Every character, Greg included, uses the studio's low-poly, human-proportion style first used in the underwater episode and in EP001. Characters have a rounded head, simple drawn faces (dark oval eyes, small smile, short brows), slim arms with elbows and hands, long legs with knees, and outfits with colored trim. Build them only with `makeCharacter()` from `src/character.js`, which every episode copies. Blocky, cube-bodied Roblox-style figures are not used. Isaac rejected that test on 2026-11-05.
+
+
 ## Establish the world
 
 Give each location a recognizable geometry. A straight road, open horizon, dam wall, park bridge, or pier provides an immediate spatial reference. Place two or three landmarks where the audience can compare the event before and after it occurs.
 
-Use stylized Roblox-inspired forms with clear silhouettes, expressive faces, readable materials, and lighting that separates subjects. The reference footage mixes simple bodies with detailed environments and effects. Exact renderer, rig type, and asset sources are unverified.
+Use the studio's low-poly human-proportion character style (makeCharacter in src/character.js), stylized forms with clear silhouettes, expressive faces, readable materials, and lighting that separates subjects. The reference footage mixes simple bodies with detailed environments and effects. Exact renderer, rig type, and asset sources are unverified.
 
 ## Camera decisions
 

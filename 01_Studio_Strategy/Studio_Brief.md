@@ -6,7 +6,7 @@ Create cinematic 3D What If simulations that make an impossible change understan
 
 ## Confirmed creative direction
 
-Isaac requested cinematic Roblox-inspired 3D What If videos, a recurring supporting character named Greg, and comprehensive analysis of successful-looking reference examples. Greg wears a baseball cap, a blue hoodie, and black pants. He is often unlucky. After the simulation has developed, a cutaway can show him reading a newspaper, ordering food, or performing another ordinary task that the event interrupts.
+Isaac requested cinematic low-poly 3D What If videos, a recurring supporting character named Greg, and comprehensive analysis of successful-looking reference examples. Greg wears a baseball cap, a blue hoodie, and black pants. He is often unlucky. After the simulation has developed, a cutaway can show him reading a newspaper, ordering food, or performing another ordinary task that the event interrupts.
 
 Isaac clarified that Greg can be in a different place in each separate simulation, almost as though he keeps ending up lost. An earlier interpretation placed him in multiple countries during one episode. The later clarification supersedes that interpretation.
 

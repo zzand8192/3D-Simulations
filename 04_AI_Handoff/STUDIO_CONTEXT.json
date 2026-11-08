@@ -10,7 +10,7 @@
     "Historical assistant proposals"
   ],
   "confirmed": {
-    "style": "Cinematic Roblox-inspired 3D What If simulations",
+    "style": "Cinematic low-poly 3D What If simulations",
     "greg": {
       "name": "Greg",
       "role": "Recurring supporting character and anticipated series feature",
@@ -121,5 +121,11 @@
     "looks_folder_remains_empty": true,
     "render_pipeline_rerun": false,
     "authority": "Recovered prior-project implementation and documented historical style, subject to current user direction"
+  },
+  "character_style": {
+    "rule": "Only the studio low-poly human-proportion style; no blocky Roblox-style figures",
+    "builder": "src/character.js makeCharacter()",
+    "confirmed": "Isaac, 2026-11-05",
+    "greg_model": "GREG_v1 (03_Greg/Model, 03_Greg/Looks)"
   }
 }

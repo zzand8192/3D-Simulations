@@ -1,3 +1,4 @@
+// THE studio character builder — the only character style used in this repo (canonical copy: src/character.js).
 // Low-poly stylized people (human proportions, simple drawn faces) with a small joint rig — the studio's
 // approved character style (from the underwater episode), extended with hoodie, apron, hi-vis vest, hard hat and beard.
 // One unit ~= 0.34 m: a character is ~5.4 units (~1.8 m) tall.
@@ -250,6 +251,30 @@ export const motion = {
   point: { aRx: -1.5, eR: -0.05, aRz: 0.05 },
   shrug: { aLz: 0.6, aRz: 0.6, eL: -1.4, eR: -1.4, aLx: -0.2, aRx: -0.2, headZ: 0.12 },
   phone: { aRx: -1.2, eR: -1.6, aRz: -0.1, headX: 0.3 },
+  // water / floor poses from the underwater episode
+  tread(t, k = 1, ph = 0) { // upright in water
+    const w = Math.sin(t * 2.6 + ph);
+    return { lLx: w * 0.35 * k - 0.1, lRx: -w * 0.35 * k - 0.1, kL: 0.35 + w * 0.2, kR: 0.35 - w * 0.2,
+      aLz: 0.6 + Math.sin(t * 2.6 + ph + 1) * 0.25 * k, aRz: 0.6 + Math.sin(t * 2.6 + ph + 2.2) * 0.25 * k, aLx: -0.35, aRx: -0.35, eL: -0.4, eR: -0.4 };
+  },
+  swim(t, k = 1, ph = 0) { // horizontal front crawl-ish (use with lean ~1.35 and root yaw)
+    const w = Math.sin(t * 6 + ph), a = t * 3.2 + ph;
+    return { lean: 1.38, headX: -0.85, lLx: w * 0.4 * k, lRx: -w * 0.4 * k, kL: 0.15 + Math.max(0, w) * 0.3, kR: 0.15 + Math.max(0, -w) * 0.3,
+      aLx: -2.9 + Math.sin(a) * 0.9 * k, aRx: -2.9 + Math.sin(a + Math.PI) * 0.9 * k, aLz: 0.2, aRz: 0.2, eL: -0.2, eR: -0.2 };
+  },
+  lounge(t, ph = 0) { // reclined lawn chair
+    const b = Math.sin(t * 1.1 + ph) * 0.02;
+    return { hipY: -1.55, lean: -0.75 + b, lLx: -1.25, lRx: -1.2, kL: 0.5, kR: 0.55, headX: 0.45, aLx: -2.6, aRx: -2.6, aLz: 0.5, aRz: 0.5, eL: -2.2, eR: -2.2 };
+  },
+  sitFloor(t, ph = 0) {
+    const b = Math.sin(t * 1.3 + ph) * 0.02;
+    return { hipY: -2.25, lLx: -1.35, lRx: -1.3, kL: 0.25, kR: 0.3, lean: -0.25 + b, aLx: 0.7, aRx: 0.7, aLz: 0.25, aRz: 0.25, headX: 0.2 };
+  },
+  crossLegFloor(t, ph = 0) {
+    const b = Math.sin(t * 1.3 + ph) * 0.02;
+    return { hipY: -2.3, lLx: -1.45, lRx: -1.45, lLz: 0.9, lRz: 0.9, kL: 2.3, kR: 2.3, lean: -0.05 + b, aLx: -0.5, aRx: -0.5, eL: -0.6, eR: -0.6, aLz: 0.15, aRz: 0.15 };
+  },
+  lieBack() { return { hipY: -2.3, lean: -1.57, lLx: 0, lRx: 0, aLz: 0.3, aRz: 0.3, aLx: -0.2, aRx: -0.2 }; },
 };
 export const mergePose = (...ps) => Object.assign({}, ...ps);
 

@@ -37,7 +37,7 @@ Open STUDIO_HANDBOOK.html to browse the notes, search them, and play the referen
 
 ## Current priorities
 
-- Develop cinematic Roblox-inspired 3D What If simulations.
+- Develop cinematic low-poly 3D What If simulations.
 - Use Greg as a recurring supporting character and anticipated series feature.
 - Change Greg's place and circumstances across separate simulations.
 - Keep the episode's question and consequences understandable through action, readable UI, and sound.

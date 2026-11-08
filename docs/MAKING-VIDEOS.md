@@ -17,7 +17,7 @@ Everything is code. Three.js builds the world, the scene at time `t` is a pure f
 | Safe area | text and key action within x 90–990, y 250–1500 (platform UI covers the edges and the bottom) |
 
 ### Characters
-Match the user's reference image: **low-poly stylized people with human proportions**, like a polished 3D simulation game. They are *not* cube-headed blocky figures.
+**This is the only character style in the series.** Use **low-poly stylized people with human proportions**, like a polished 3D simulation game, built with `makeCharacter()` from `src/character.js`. Never build cube-headed blocky figures, even when a prompt says "Roblox-inspired" or "blocky"; Isaac confirmed this on 2026-11-05.
 
 - They have a head (rounded box) with a neck and ears. The face is a drawn decal: dark oval eyes with a tiny highlight, short brows, and a small reddish smile.
 - Their torso is a tapered T-shirt with a **colored collar and sleeve trim** (the signature look is a blue tee with orange trim). They have slim skin-colored arms with hands, long trousers or shorts, and **white sneakers**.

@@ -2,7 +2,7 @@
 
 ## His function in the series
 
-Greg is the recurring supporting character in Isaac's cinematic Roblox-inspired 3D What If simulations. Isaac compared the role he wants Greg to play with the recurring tsunami payoff in the supplied reference videos. The audience becomes familiar with a repeated feature of the series and starts anticipating it. Greg provides that recognition through a person, an ordinary task, and the episode's effect on his day.
+Greg is the recurring supporting character in Isaac's cinematic low-poly 3D What If simulations. Isaac compared the role he wants Greg to play with the recurring tsunami payoff in the supplied reference videos. The audience becomes familiar with a repeated feature of the series and starts anticipating it. Greg provides that recognition through a person, an ordinary task, and the episode's effect on his day.
 
 The recurring audience question is where Greg will turn up in this simulation and what the event will do to him. A viewer meeting him for the first time should still understand the scene. A returning viewer gets the additional pleasure of recognizing him before the consequence arrives.
 
@@ -12,7 +12,7 @@ Greg should be recurring enough to become part of the series' identity. He can a
 
 Isaac chose the name Greg, a baseball cap, a blue hoodie, black pants, an often-unlucky personality, and a recognizable supporting role. Claude will create Greg's final character model. Isaac provides creative direction and reviews the result. The Looks folder is intentionally empty.
 
-Earlier assistants proposed a black forward-facing cap, a medium-blue hoodie with a front pocket, white sneakers, an age of 23, average blocky proportions, a simple expressive face, and a casual mildly sarcastic voice. These are working design suggestions. They are not finished assets or independently confirmed specifications. Keep the selected cap, hoodie, and pants as the confirmed visual anchors while Claude develops the final design using Isaac's creative direction.
+Earlier assistants proposed a black forward-facing cap, a medium-blue hoodie with a front pocket, white sneakers, an age of 23, average proportions (now built in the studio low-poly human-proportion style), a simple expressive face, and a casual mildly sarcastic voice. These are working design suggestions. They are not finished assets or independently confirmed specifications. Keep the selected cap, hoodie, and pants as the confirmed visual anchors while Claude develops the final design using Isaac's creative direction.
 
 Once a design is approved, record exact colors, proportions, face, accessories, rig, and voice. Reuse that model and its approved references. Lighting and camera angles may vary while the underlying identity remains consistent.
 

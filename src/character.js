@@ -1,4 +1,6 @@
-// Low-poly stylized people (human proportions, simple drawn faces) with a small joint rig.
+// THE studio character builder — the only character style used in this repo (canonical copy: src/character.js).
+// Low-poly stylized people (human proportions, simple drawn faces) with a small joint rig — the studio's
+// approved character style (from the underwater episode), extended with hoodie, apron, hi-vis vest, hard hat and beard.
 // One unit ~= 0.34 m: a character is ~5.4 units (~1.8 m) tall.
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from './vendor/RoundedBoxGeometry.js';
@@ -14,7 +16,7 @@ const torsoG = (wt, wb, h, d) => cached(`t${wt}|${wb}|${h}|${d}`, () => {
 });
 
 const matCache = new Map();
-function mat(color, opts = {}) {
+export function mat(color, opts = {}) {
   const k = color + JSON.stringify(opts);
   if (!matCache.has(k)) matCache.set(k, causticMaterial({ color, roughness: 0.72, metalness: 0, ...opts }));
   return matCache.get(k);
@@ -91,6 +93,11 @@ export function makeCharacter(spec) {
     top: { color: '#2f6fe0', trim: '#f0a03a', sleeves: 'short', ...(spec.top || {}) },
     bottom: { color: '#23252b', length: 'long', ...(spec.bottom || {}) },
   };
+  const kind = s.top.kind || 'tee', hoodie = kind === 'hoodie';
+  if (spec.top && !spec.top.sleeves) s.top.sleeves = kind === 'tank' ? 'none' : (kind === 'long' || hoodie) ? 'long' : 'short';
+  if (s.cap === true) s.cap = s.capColor || '#141518';
+  if (s.hairStyle === 'buzz') s.hairStyle = 'short';
+  if (typeof s.coat === 'string') s.coat = true;
   const root = new THREE.Group(); root.name = s.name || 'person';
   const body = new THREE.Group(); body.scale.setScalar(s.scale); root.add(body);
   const hips = new THREE.Group(); hips.position.y = 2.62; body.add(hips);
@@ -113,6 +120,14 @@ export function makeCharacter(spec) {
     add(torso, rbox(0.2, 0.12, 0.03, 0.02), mat('#3a7bd5'), -0.32, 1.2, 0.41); // pen in pocket
   }
   if (s.tie) add(torso, rbox(0.14, 0.95, 0.05, 0.03), mat(s.tie), 0, 1.15, 0.38);
+  if (hoodie) { // hood resting on the back, kangaroo pocket, drawstrings, ribbed waistband
+    const hood = add(torso, rbox(0.95, 0.5, 0.42, 0.18), topM, 0, 1.62, -0.34); hood.rotation.x = 0.35;
+    add(torso, rbox(0.66, 0.36, 0.06, 0.05), trimM, 0, 0.42, 0.33);
+    for (const x of [-0.12, 0.12]) add(torso, rbox(0.04, 0.42, 0.04, 0.02), mat('#f4f4f2'), x, 1.42, 0.39);
+    add(torso, limb(0.52, 0.52, 0.12), trimM, 0, 0.12, 0).scale.z = 0.66;
+  }
+  if (s.apron) add(torso, rbox(0.86, 1.3, 0.05, 0.03), mat(s.apron), 0, 0.72, 0.37);
+  if (s.vest) { const vm = mat(s.vest, { emissive: s.vest, emissiveIntensity: 0.15 }); const v = add(torso, torsoG(0.7, 0.55, 1.35, 0.64), vm, 0, 0.3, 0); for (const y of [0.75, 1.15]) add(torso, limb(0.69, 0.66, 0.1), mat('#e8eef0', { metalness: 0.4, roughness: 0.3 }), 0, y, 0).scale.z = 0.66; }
   if (s.backpack) add(torso, rbox(0.95, 1.05, 0.45, 0.14), mat(s.backpack), 0, 0.9, -0.55);
   if (s.top.text) {
     const c = document.createElement('canvas'); c.width = 256; c.height = 96; const g = c.getContext('2d');
@@ -149,6 +164,7 @@ export function makeCharacter(spec) {
     add(head, rbox(0.9, 0.3, 0.9, 0.16), capM, 0, 0.42, 0);
     add(head, rbox(0.8, 0.05, 0.42, 0.02), capM, 0, 0.3, 0.6);
   }
+  if (s.hardhat) { const hm = mat(s.hardhat, { roughness: 0.4 }); add(head, rbox(0.92, 0.36, 0.92, 0.16), hm, 0, 0.44, 0); add(head, rbox(1.04, 0.05, 1.1, 0.02), hm, 0, 0.28, 0.04); }
   if (s.headset) add(head, rbox(0.06, 0.16, 0.4, 0.02), mat('#222'), 0.42, -0.18, 0.18);
   // sunglasses (on face, can be hidden)
   const shades = new THREE.Group(); head.add(shades);
@@ -169,6 +185,7 @@ export function makeCharacter(spec) {
     add(sh, limb(0.17, 0.155, 0.95), longSleeve ? sleeveM : skinM);
     const el = new THREE.Group(); el.position.y = -0.95; sh.add(el);
     add(el, limb(0.15, 0.13, 0.82), longSleeve ? sleeveM : skinM);
+    if (hoodie) add(el, limb(0.15, 0.15, 0.12), trimM, 0, -0.7, 0);
     const hand = new THREE.Group(); hand.position.y = -0.82; el.add(hand);
     add(hand, rbox(0.22, 0.32, 0.14, 0.06), skinM, 0, -0.14, 0);
     return { sh, el, hand };
@@ -208,7 +225,7 @@ export function makeCharacter(spec) {
       legL.ft.rotation.set(p.fL || 0, 0, 0); legR.ft.rotation.set(p.fR || 0, 0, 0);
     },
     setFace(e, t = 0, talking = false, seed = 0) {
-      const f = { lips: !!s.lips, ...e };
+      const f = { lips: !!s.lips, beard: s.beard || null, ...e };
       if (talking) f.mouth = f.mouth === 'shout' ? (Math.floor(t * 9) % 3 ? 'shout' : 'open') : TALK[Math.floor(t * 11 + seed) % TALK.length];
       const bp = (t + seed * 0.61) % 3.9;
       if (bp < 0.12 && (f.eyes === 'open' || f.eyes === 'wide' || !f.eyes)) f.eyes = 'closed';
@@ -221,15 +238,20 @@ export function makeCharacter(spec) {
 
 // ---------------------------------------------------------------- motions (return pose objects)
 export const motion = {
-  idle(t, k = 1, ph = 0) {
-    const b = Math.sin(t * 1.5 + ph) * 0.025 * k;
-    return { torsoX: b, headX: -b, aLz: 0.1 + b, aRz: 0.1 + b, eL: -0.12, eR: -0.12, headY: Math.sin(t * 0.4 + ph) * 0.12 * k };
-  },
+  idle(t, k = 1, ph = 0) { const b = Math.sin(t * 1.5 + ph) * 0.025 * k; return { torsoX: b, headX: -b, aLz: 0.1 + b, aRz: 0.1 + b, eL: -0.12, eR: -0.12, headY: Math.sin(t * 0.4 + ph) * 0.12 * k }; },
   walk(t, sp = 1, ph = 0) {
     const w = Math.sin(t * 6.5 * sp + ph), c = Math.cos(t * 6.5 * sp + ph);
-    return { lLx: w * 0.55, lRx: -w * 0.55, kL: Math.max(0, -c) * 0.8 + 0.08, kR: Math.max(0, c) * 0.8 + 0.08,
-      aLx: -w * 0.45, aRx: w * 0.45, eL: -0.3, eR: -0.3, aLz: 0.1, aRz: 0.1, hipY: -Math.abs(c) * 0.06 };
+    return { lLx: w * 0.55, lRx: -w * 0.55, kL: Math.max(0, -c) * 0.8 + 0.08, kR: Math.max(0, c) * 0.8 + 0.08, aLx: -w * 0.45, aRx: w * 0.45, eL: -0.3, eR: -0.3, aLz: 0.1, aRz: 0.1, hipY: -Math.abs(c) * 0.06 };
   },
+  run(t, sp = 1, ph = 0) { const w = Math.sin(t * 9 * sp + ph), c = Math.cos(t * 9 * sp + ph); return { lean: 0.15, lLx: w * 0.8, lRx: -w * 0.8, kL: Math.max(0, -c) * 1.3 + 0.2, kR: Math.max(0, c) * 1.3 + 0.2, aLx: -w * 0.8, aRx: w * 0.8, eL: -1.2, eR: -1.2, hipY: -0.1 - Math.abs(c) * 0.1 }; },
+  sitChair(t, ph = 0) { const b = Math.sin(t * 1.3 + ph) * 0.02; return { hipY: -1.1, lLx: -1.5, lRx: -1.45, kL: 1.5, kR: 1.45, lean: -0.08 + b, aLz: 0.12, aRz: 0.12, aLx: -0.35, aRx: -0.35, eL: -0.6, eR: -0.6 }; },
+  lookDown: { headX: 0.5, torsoX: 0.12 },
+  handsOnHead: { aLx: -2.6, aRx: -2.6, aLz: 0.5, aRz: 0.5, eL: -2.0, eR: -2.0 },
+  armsOut: { aLz: 0.9, aRz: 0.9, eL: -0.4, eR: -0.4, aLx: -0.4, aRx: -0.4 },
+  point: { aRx: -1.5, eR: -0.05, aRz: 0.05 },
+  shrug: { aLz: 0.6, aRz: 0.6, eL: -1.4, eR: -1.4, aLx: -0.2, aRx: -0.2, headZ: 0.12 },
+  phone: { aRx: -1.2, eR: -1.6, aRz: -0.1, headX: 0.3 },
+  // water / floor poses from the underwater episode
   tread(t, k = 1, ph = 0) { // upright in water
     const w = Math.sin(t * 2.6 + ph);
     return { lLx: w * 0.35 * k - 0.1, lRx: -w * 0.35 * k - 0.1, kL: 0.35 + w * 0.2, kR: 0.35 - w * 0.2,
@@ -239,10 +261,6 @@ export const motion = {
     const w = Math.sin(t * 6 + ph), a = t * 3.2 + ph;
     return { lean: 1.38, headX: -0.85, lLx: w * 0.4 * k, lRx: -w * 0.4 * k, kL: 0.15 + Math.max(0, w) * 0.3, kR: 0.15 + Math.max(0, -w) * 0.3,
       aLx: -2.9 + Math.sin(a) * 0.9 * k, aRx: -2.9 + Math.sin(a + Math.PI) * 0.9 * k, aLz: 0.2, aRz: 0.2, eL: -0.2, eR: -0.2 };
-  },
-  sitChair(t, ph = 0) {
-    const b = Math.sin(t * 1.3 + ph) * 0.02;
-    return { hipY: -1.1, lLx: -1.5, lRx: -1.45, kL: 1.5, kR: 1.45, lean: -0.08 + b, aLz: 0.12, aRz: 0.12, aLx: -0.35, aRx: -0.35, eL: -0.6, eR: -0.6 };
   },
   lounge(t, ph = 0) { // reclined lawn chair
     const b = Math.sin(t * 1.1 + ph) * 0.02;
@@ -259,3 +277,17 @@ export const motion = {
   lieBack() { return { hipY: -2.3, lean: -1.57, lLx: 0, lRx: 0, aLz: 0.3, aRz: 0.3, aLx: -0.2, aRx: -0.2 }; },
 };
 export const mergePose = (...ps) => Object.assign({}, ...ps);
+
+// ---------------------------------------------------------------- GREG — model v1 (studio recurring character)
+// Confirmed anchors (Isaac): baseball cap, blue hoodie, black pants, often unlucky.
+// v1 choices (Claude, pending Isaac's review): black cap worn forward, medium-blue hoodie (#2f6fd6) with hood,
+// front pocket, drawstrings and darker ribbed cuffs/waistband (#2456b0), straight black pants (#18191d),
+// white sneakers, warm light-medium skin (#d8a47f), short dark-brown hair, age ~23. Built in the studio's
+// low-poly human-proportion character style.
+export const GREG = {
+  name: 'greg', skin: '#d8a47f', hair: '#2b1a10', hairStyle: 'short',
+  top: { kind: 'hoodie', color: '#2f6fd6', trim: '#2456b0' },
+  bottom: { color: '#18191d', length: 'long' },
+  shoes: '#f5f5f5', cap: '#141518',
+};
+export const GREG_MODEL_VERSION = 'GREG_v1 (2026-11-05)';

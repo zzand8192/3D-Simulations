@@ -4,7 +4,7 @@ Compiled November 4, 2026 from the available prior chat and this chat.
 
 | Item | Current state | Evidence or reason |
 | --- | --- | --- |
-| Genre | Cinematic Roblox-inspired 3D What If | Isaac's original character request |
+| Genre | Cinematic low-poly 3D What If | Isaac's original character request |
 | Recurring name | Greg | Isaac renamed the original assistant proposal |
 | Visual anchors | Baseball cap, blue hoodie, black pants | Isaac's explicit choices |
 | Personality | Often unlucky, supporting role | Isaac's explicit choices |
