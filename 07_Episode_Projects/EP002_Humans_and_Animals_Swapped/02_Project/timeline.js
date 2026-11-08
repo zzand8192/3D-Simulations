@@ -40,17 +40,18 @@ export function makeShots(S, cues) {
     tom.root.position.set(x, 0.32, 3.0); tom.root.rotation.y = Math.PI / 2;
     // the dog: all fours → sits → stands up → takes the leash → walks Tom
     const up = IO(seg(t, 6.0, 7.0)), sit = IO(seg(t, 5.2, 5.6)) * (1 - up);
-    let bx = x + 3.2; if (t > 12.0) bx += (t - 12.0) * 2.2;
+    const go = IO(seg(t, 12.0, 12.5)); let bx = x + 3.2; if (t > 12.0) bx += (t - 12.0) * 2.2 * go;
     biscuit.root.position.set(bx, 0.32, 4.4); biscuit.root.rotation.y = up > 0.5 ? lerp(Math.PI / 2, -Math.PI / 2 + 0.3, IO(seg(t, 7.0, 7.4))) : Math.PI / 2;
-    if (t > 7.4) biscuit.root.rotation.y = t > 12 ? Math.PI / 2 : -Math.PI / 2 + 0.3;
+    if (t > 7.4) biscuit.root.rotation.y = lerp(-Math.PI / 2 + 0.3, Math.PI / 2, IO(seg(t, 11.9, 12.45)));
     const fours = mergePose(allFours(t, walking ? 1 : 0), sit > 0 ? { lean: lerp(1.32, 0.7, sit), hipY: lerp(-0.95, -1.5, sit), headX: lerp(-1.05, -0.3, sit) } : {});
-    const upright = t > 12 ? motion.walk(t, 0.9) : mergePose(motion.idle(t), t > 7.0 ? { aLx: -0.7, eL: -0.6 } : {}, t > 7.6 && t < 10.2 ? { aRx: -0.3 + Math.sin(t * 3) * 0.2, eR: -1.2 } : {});
+    const stand = mergePose(motion.idle(t), t > 7.0 ? { aLx: -0.7, eL: -0.6 } : {}, t > 7.6 && t < 10.2 ? { aRx: -0.3 + Math.sin(t * 3) * 0.2, eR: -1.2 } : {});
+    const upright = t > 12 ? blend(stand, motion.walk(t, 0.9), go) : stand;
     biscuit.pose(blend(fours, upright, up));
     biscuit.wag(t, up > 0.5 ? 0.4 : 1);
     face(biscuit, t < 7.0 ? { eyes: 'happy' } : { eyes: 'half', brows: 'flat' }, t, 3);
     // Tom walks, then is walked
     let tp = walking ? motion.walk(t, 0.9) : motion.idle(t);
-    if (t > 12.0) { tom.root.position.x = x + (t - 12.0) * 2.2 - 0.6; tp = mergePose(motion.walk(t, 0.95), { lean: 0.22, headX: -0.1, aLx: -0.9 }); }
+    if (t > 12.0) { tom.root.position.x = x + (t - 12.0) * 2.2 * go - 0.6 * go; tp = blend(tp, mergePose(motion.walk(t, 0.95), { lean: 0.22, headX: -0.1, aLx: -0.9 }), go); }
     tom.pose(mergePose(tp, t < 7.2 ? { aRx: -0.55, eR: -0.7, aRz: 0.15 } : {}));
     face(tom, t < 7.0 ? { eyes: 'open', mouth: 'smile' } : t < 10.2 ? { eyes: 'wide', mouth: 'o', brows: 'up' } : { eyes: 'wide', mouth: 'small-o', brows: 'worried' }, t);
     ST.collar.visible = t > 7.2;
@@ -73,7 +74,7 @@ export function makeShots(S, cues) {
       scene: S.street,
       update(lt, t, cam) {
         street.last = street(t, cam);
-        const k = IO(seg(t, 5, 12.6)), x = walkX(t) + (t > 12 ? (t - 12) * 2.2 : 0);
+        const k = IO(seg(t, 5, 12.6)), x = walkX(t) + (t > 12 ? (t - 12) * 2.2 * IO(seg(t, 12.0, 12.5)) : 0);
         aim(cam, v3(x + lerp(1.0, 2.2, k), lerp(3.4, 3.8, k), lerp(16.5, 14.5, k)), v3(x + 1.7, lerp(3.0, 3.6, k), 3.6), 50);
       },
       after: leashAfter, speakers: () => ({ biscuit: biscuit.head, tom: tom.head }),
@@ -83,12 +84,12 @@ export function makeShots(S, cues) {
       scene: S.city,
       update(lt, t, cam) {
         const { police, stopped } = C.actors;
-        police.root.position.set(-15.4, 0.3, 13.0); police.root.rotation.y = Math.PI;
+        police.root.position.set(-15.4, 0.3, 19.0); police.root.rotation.y = Math.PI;
         police.pose(mergePose(motion.idle(t), t > 13.1 && t < 16 ? { aRx: -1.3, eR: -0.2, aRz: 0.1 } : {})); face(police, { eyes: 'open', brows: 'flat' }, t, 2); police.wag(t, 0.3);
-        stopped.root.position.set(-15.6, 0.3, 8.4); stopped.root.rotation.y = 0;
+        stopped.root.position.set(-15.6, 0.3, 14.6); stopped.root.rotation.y = 0;
         stopped.pose(mergePose(motion.idle(t), { aLx: -2.7, aRx: -2.7, aLz: 0.35, aRz: 0.35, eL: -0.5, eR: -0.5 })); face(stopped, { eyes: 'wide', mouth: 'o', brows: 'up' }, t, 1);
         const k = IO(seg(lt, 0, 4.2));
-        aim(cam, mix3(v3(-5.6, 5.0, 11.8), v3(-6.0, 5.0, 11.0), k), v3(-15.5, 4.4, 10.6), 58);
+        aim(cam, mix3(v3(-5.6, 5.0, 18.0), v3(-6.0, 5.0, 17.2), k), v3(-15.5, 4.4, 16.8), 58);
       },
       speakers: () => ({ police: C.actors.police.head }),
     }),
@@ -129,7 +130,7 @@ export function makeShots(S, cues) {
       },
       speakers: () => ({ anchor: S.studio.userData.actors.anchor.head }),
     }),
-    shot('tokyo', { scene: S.tokyo, update(lt, t, cam) { aim(cam, v3(5, 7, 44 - lt * 2), v3(15, 3.5, 14), 52, 0.1, t); } }),
+    shot('tokyo', { scene: S.tokyo, update(lt, t, cam) { aim(cam, v3(15.5, 9.5, 48 - lt * 1.5), v3(13, 3.5, 12), 52, 0.08, t); } }),
     shot('london', { scene: S.london, update(lt, t, cam) { aim(cam, v3(30, 30, 60 - lt * 3), v3(0, 2, -10), 52, 0.12, t); } }),
     // ---------------------------------------------------------------- 4. Greg at the zoo — Sydney
     shot('zooRead', {
@@ -149,7 +150,7 @@ export function makeShots(S, cues) {
         const { greg, keeper } = Z.actors; gregSit(greg, t, IO(seg(t, 43.6, 44.2)));
         keeper.root.position.set(2.2, 0, 3.8); keeper.root.rotation.y = -Math.PI / 2 - 0.35;
         keeper.pose(mergePose(motion.idle(t), t > 44.5 && t < 46.4 ? { aRx: -1.2, aRy: -0.5, eR: -0.2 } : {})); face(keeper, { eyes: 'open', brows: 'soft' }, t); keeper.wag(t, 0.2);
-        aim(cam, mix3(v3(0.4, 4.6, 16.0), v3(0.2, 4.5, 14.4), IO(seg(lt, 0, 3.8))), v3(0.1, 3.8, 3.0), 50);
+        aim(cam, mix3(v3(0.6, 5.0, 18.0), v3(0.4, 4.9, 16.6), IO(seg(lt, 0, 3.8))), v3(0.4, 4.0, 3.0), 50);
       },
       speakers: () => ({ keeper: Z.actors.keeper.head }),
     }),
@@ -158,8 +159,8 @@ export function makeShots(S, cues) {
       update(lt, t, cam) {
         const { greg, keeper } = Z.actors; gregSit(greg, t, 1, t < 48.3 ? Math.sin(seg(t, 47.0, 48.3) * Math.PI * 2) * 0.9 : 0);
         keeper.root.position.set(lerp(2.2, 12.6, IO(seg(t, 47.0, 48.6))), 0, 3.8); keeper.root.rotation.y = Math.PI / 2; keeper.pose(motion.walk(t, 0.9)); face(keeper, { eyes: 'happy' }, t);
-        const k = IO(seg(t, 47.0, 50.4));
-        aim(cam, mix3(v3(0.2, 4.5, 14.4), v3(25, 8.5, 21), k), mix3(v3(0.1, 3.8, 3.0), v3(-3, 3.6, 1.0), k), lerp(50, 52, k));
+        const k = IO(seg(t, 47.0, 51.4));
+        aim(cam, mix3(v3(0.4, 4.9, 16.6), v3(27, 12.5, 17), k), mix3(v3(0.4, 4.0, 3.0), v3(2.5, 3.6, 2.0), k), lerp(50, 54, k));
       },
       speakers: () => ({ greg: Z.actors.greg.head }),
     }),
@@ -207,7 +208,7 @@ export function makeShots(S, cues) {
       speakers: () => ({ vet: S.vet.userData.actors.vet.head }),
     }),
     // ---------------------------------------------------------------- 6. month 6: cities for every species
-    shot('aerial6', { scene: S.city6, update(lt, t, cam) { const k = IO(seg(lt, 0, 5.2)); aim(cam, mix3(v3(60, 130, 230), v3(26, 96, 170), k), v3(0, 18, -60), 54); } }),
+    shot('aerial6', { scene: S.city6, update(lt, t, cam) { const k = IO(seg(lt, 0, 5.2)); aim(cam, mix3(v3(10, 240, 260), v3(4, 200, 210), k), v3(0, 10, -70), 54); } }),
     shot('billboard', {
       scene: S.city6, prerender: (R, t) => { const a = S.studio.userData.actors.anchor; a.pose(mergePose(motion.sitChair(t), { aLx: -0.75, aRx: -0.75, eL: -0.95, eR: -0.95, aLz: 0.18, aRz: 0.18 })); a.setFace({ eyes: 'open' }, t, talking('anchor', t)); R.renderBoard(t); },
       update(lt, t, cam) { const k = IO(seg(lt, 0, 7.2)); aim(cam, mix3(v3(6, 6, 46), v3(4, 7, 40), k), mix3(v3(-14, 19, 10), v3(-6, 26, -10), IO(seg(t, 74.6, 77.2))), 54); },
@@ -227,7 +228,7 @@ export function makeShots(S, cues) {
         face(h, t < 85.3 ? { eyes: 'wide', mouth: 'grin', brows: 'up' } : { eyes: 'happy', mouth: 'grin' }, t, 1);
         L.leashState = t < 85.4 ? 'tom' : 'dog';
         const k = IO(seg(lt, 0, 10));
-        aim(cam, mix3(v3(8.6, 12.4, 26), v3(8.0, 12.0, 24), k), v3(6.4, 2.8, -1.5), 58);
+        aim(cam, mix3(v3(5.2, 12.0, 29), v3(4.8, 11.6, 27), k), v3(4.8, 3.0, -1.0), 56);
       },
       after(t) { const { biscuit: b, tom: h } = L.actors; L.leash.userData.update(L.leashState === 'tom' ? h.armR.hand : b.armL.hand, h.neck, 0.6, v3(0, -0.25, 0), v3(0, 0.08, 0)); },
       speakers: () => ({ biscuit: L.actors.biscuit.head, tom: L.actors.tom.head }),

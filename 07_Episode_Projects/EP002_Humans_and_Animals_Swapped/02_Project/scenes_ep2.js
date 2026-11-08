@@ -164,7 +164,7 @@ export function buildDogPark(renderer) {
   scene.add(V.at(V.B(400, 1, 400, CM('#7fae52', { roughness: 1 })), 0, -0.5, 0));
   for (let i = 0; i < 26; i++) { const t = tree(r, 1.4 + r()); const a = r() * 6.28, d = 45 + r() * 50; t.position.set(Math.cos(a) * d, 0, Math.sin(a) * d - 20); scene.add(t); }
   const sign = V.signPost('HUMAN PARK\nOFF-LEASH AREA', { w: 6, h: 2.6, bg: '#3f5a2a', height: 6 }); sign.position.set(-9, 0, 4); scene.add(sign);
-  const dogs = [put(scene, animal.parkdog(), -3, 0, 6, 0.4), put(scene, makeAnimal('dog', 'casual', { spec: { top: { kind: 'tee', color: '#e94f6a', trim: '#fff' } } }), 2.5, 0, 7, -0.3)];
+  const dogs = [put(scene, animal.parkdog(), -3, 0, 6, Math.PI - 0.5), put(scene, makeAnimal('dog', 'casual', { spec: { top: { kind: 'tee', color: '#e94f6a', trim: '#fff' } } }), 2.5, 0, 7, Math.PI + 0.4)];
   const humans = []; for (let i = 0; i < 4; i++) { const h = makeCharacter(randomPerson(r)); addCollar(h, ['#c9473a', '#2f6fe0', '#3aa76d', '#f2c230'][i]); put(scene, h, -4 + i * 2.6, 0, 0, Math.PI); humans.push({ h, ph: r() * 6 }); }
   const frisbee = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.1, 18), CM('#f2c230')); frisbee.castShadow = true; scene.add(frisbee);
   Object.assign(scene.userData, { dogs, humans, frisbee, exposure: 1.0, caustic: 0, update() {} });
@@ -216,14 +216,15 @@ export function buildLivingRoom(renderer) {
   const scene = interior(renderer, { wall: '#efe2cf', floor: '#9a6b45', w: 40, d: 30, h: 14 });
   scene.background = new THREE.Color('#efe2cf');
   const lamp = new THREE.PointLight('#ffc884', 140, 40, 1.6); lamp.position.set(-8, 9, 2); scene.add(lamp);
+  const ext = new THREE.Mesh(new THREE.PlaneGeometry(80, 60), CM('#9a6b45', { roughness: 0.7 })); ext.rotation.x = -Math.PI / 2; ext.position.set(0, -0.01, 30); ext.receiveShadow = true; scene.add(ext);
   const couchM = CM('#5d7fa3', { roughness: 0.95 });
   const couch = new THREE.Group(); couch.position.set(-3, 0, -6); scene.add(couch);
   couch.add(V.at(V.B(10, 1.4, 3.6, couchM, 0.3), 0, 1.0, 0), V.at(V.B(10, 3, 1, couchM, 0.3), 0, 2.4, -1.5), V.at(V.B(1, 2.2, 3.6, couchM, 0.3), -5, 1.5, 0), V.at(V.B(1, 2.2, 3.6, couchM, 0.3), 5, 1.5, 0));
   for (const x of [-2.4, 2.4]) couch.add(V.at(V.B(2.6, 1.6, 0.6, CM('#f2c230'), 0.25), x, 2.3, -0.9));
-  const tv = new THREE.Group(); tv.position.set(-3, 4.4, 9); tv.rotation.y = Math.PI; scene.add(tv);
+  const tv = new THREE.Group(); tv.position.set(-12, 4.4, 9); tv.rotation.y = Math.PI - 0.5; scene.add(tv);
   tv.add(V.B(7, 4, 0.3, CM('#111', { roughness: 0.3 })));
   const scr = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 3.6), new THREE.MeshBasicMaterial({ map: P.canvasTex(512, 280, (g, W, Hh) => { const gr = g.createLinearGradient(0, 0, 0, Hh); gr.addColorStop(0, '#6fb7e8'); gr.addColorStop(1, '#7fbf62'); g.fillStyle = gr; g.fillRect(0, 0, W, Hh); g.fillStyle = '#c9473a'; g.beginPath(); g.ellipse(260, 180, 40, 30, 0, 0, 7); g.fill(); g.fillStyle = '#fff'; g.font = '700 28px Arial'; g.fillText('SQUIRREL TV', 20, 40); }), toneMapped: false })); scr.position.z = 0.16; tv.add(scr);
-  scene.add(V.at(V.B(8, 2.4, 2, CM('#3a2e28')), -3, 1.2, 9.2));
+  scene.add(V.at(V.B(8, 2.4, 2, CM('#3a2e28')), -12, 1.2, 9.2));
   const door = new THREE.Group(); door.position.set(14, 0, 4); scene.add(door);
   door.add(V.at(V.B(0.3, 9, 5.2, CM('#e9e2d6')), 0.3, 4.5, 0));
   const leaf = new THREE.Group(); leaf.position.set(0, 0, -2.3); door.add(leaf); leaf.add(V.at(V.B(0.25, 8.2, 4.6, CM('#8e3b2b')), 0, 4.1, 2.3));

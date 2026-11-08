@@ -271,7 +271,7 @@ export function buildSuburb(renderer, opts = {}) {
     const doorPivot = new THREE.Group(); doorPivot.position.set(-1.25, 0, 6.05); g.add(doorPivot);
     doorPivot.add(V.at(V.B(2.5, 5.2, 0.25, causticMaterial({ color: ['#8e3b2b', '#2f4f8c', '#3a6b4a'][(i + 9) % 3] })), 1.25, 2.6, 0));
     g.userData.door = doorPivot;
-    const mb = new THREE.Group(); mb.add(V.at(V.B(0.25, 3, 0.25, causticMaterial({ color: '#555' })), 0, 1.5, 0), V.at(V.B(1, 0.8, 1.4, causticMaterial({ color: '#2b2d31' }), 0.2), 0, 3.2, 0)); mb.position.set(i * 22 + 4, 0.3, 4.5); scene.add(mb);
+    if (!opts.intact) { const mb = new THREE.Group(); mb.add(V.at(V.B(0.25, 3, 0.25, causticMaterial({ color: '#555' })), 0, 1.5, 0), V.at(V.B(1, 0.8, 1.4, causticMaterial({ color: '#2b2d31' }), 0.2), 0, 3.2, 0)); mb.position.set(i * 22 + 4, 0.3, 4.5); scene.add(mb); }
     if (r() < 0.7) { const t = tree(r, 1.2); t.position.set(i * 22 + 9, 0.3, -2); scene.add(t); }
   }
   // parked cars stranded where the curbside used to be + a basketball hoop, bins
