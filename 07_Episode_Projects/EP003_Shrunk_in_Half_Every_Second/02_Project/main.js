@@ -1,7 +1,7 @@
 // EP003 — What if you shrunk in half every second?  Renderer, world, post chain, renderAt(t).
 import * as THREE from 'three';
 import { U, lerp, clamp01, ease } from './env.js';
-import { buildWorld, updateWorld } from './scenes_ep3.js';
+import { buildWorld, updateWorld, lookTau } from './scenes_ep3.js';
 import { placeCamera, actGreg, bubbleBursts, fadeAt, flashAt } from './timeline.js';
 import { tauP } from './clock.js';
 import { makePost } from './post.js';
@@ -38,7 +38,7 @@ function renderAt(t) {
   renderer.toneMappingExposure = world.exposure || 1;
   world.scene.updateMatrixWorld();
   const focus = camera.position.distanceTo(new THREE.Vector3(world.greg.root.position.x, 3.0 + world.greg.root.position.y, world.greg.root.position.z));
-  post.render(world.scene, camera, { focus, ...postAt(tau) });
+  post.render(world.scene, camera, { focus, ...postAt(lookTau(t, tau)) });
   updateUI(t, cues, flashAt(t));
   document.getElementById('fade').style.opacity = fadeAt(t, cues).toFixed(3);
 }

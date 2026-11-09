@@ -283,10 +283,14 @@ function look(tau) {
   return { a, b, k, c: (f, j) => col(a[f][j], b[f][j], k), n: (f) => lerp(a[f], b[f], k) };
 }
 
+// The dry-to-water switch happens at the splash (under the flash), not when tau reaches 13.62.
+export const SPLASH = 17.62;
+export const lookTau = (t, tau) => (t >= SPLASH ? Math.max(tau, 13.62) : Math.min(tau, 13.5));
+
 export function updateWorld(W, t, tau, cam) {
-  const k = K(tau), city = tau < 13.62;
+  const k = K(tau), wet = t >= SPLASH, city = !wet, tl = lookTau(t, tau);
   // ---- look
-  const L = look(tau);
+  const L = look(tl);
   const u = W.dome.material.uniforms; u.cTop.value.copy(L.c('dome', 0)); u.cMid.value.copy(L.c('dome', 1)); u.cBot.value.copy(L.c('dome', 2)); u.useSun.value = city ? 1 : 0;
   W.scene.fog.color.copy(col(L.a.fog, L.b.fog, L.k));
   if (city) { W.scene.fog.near = 160 * Math.pow(2, tau); W.scene.fog.far = 700 * Math.pow(2, tau); }
@@ -344,14 +348,14 @@ export function updateWorld(W, t, tau, cam) {
     Mo.poseInsectLegs(W.mite.userData.legs, t, mk < 1 ? 14 : 0, 0.8);
   }
   // ---- micro (micrometres)
-  const micro = inWin(tau, 13.62, 21.6);
-  W.microG.visible = micro || inWin(tau, 13.62, 22.4);
+  const micro = inWin(tl, 13.62, 21.6);
+  W.microG.visible = micro || inWin(tl, 13.62, 22.4);
   if (W.microG.visible) {
     W.microG.scale.setScalar(k * UM);
     const pk = seg(t, 17.7, 19.4), pPts = [v3(-8, 5, 24), v3(4, 3, 8), v3(12, 2, -14)].map((p) => spotAt(p, 14, UM));
-    W.para.visible = inWin(tau, 13.62, 16.2); W.para.position.copy(path(pPts, pk)); const pdv = path(pPts, Math.min(1, pk + 0.01)).sub(path(pPts, pk)); W.para.rotation.y = Math.atan2(pdv.x, pdv.z); W.para.rotation.z = Math.sin(t * 2) * 0.15;
+    W.para.visible = inWin(tl, 13.62, 16.2); W.para.position.copy(path(pPts, pk)); const pdv = path(pPts, Math.min(1, pk + 0.01)).sub(path(pPts, pk)); W.para.rotation.y = Math.atan2(pdv.x, pdv.z); W.para.rotation.z = Math.sin(t * 2) * 0.15;
     W.para.userData.cilia.rotation.z = Math.sin(t * 18) * 0.012;
-    W.hairM.visible = inWin(tau, 13.62, 17.2);
+    W.hairM.visible = inWin(tl, 13.62, 17.2);
     W.pol.visible = inWin(tau, 13.8, 18.0); W.pol.position.copy(lerpV(spotAt(v3(5, 11, 10), 16, UM), spotAt(v3(7, 5, 5), 16, UM), seg(t, 19.0, 21.0))); W.pol.rotation.set(t * 0.2, t * 0.3, 0);
     W.flake.visible = inWin(tau, 14.8, 18.8); W.flake.rotation.z = -0.3 + t * 0.03;
     W.rbcs.forEach((c, i) => { c.visible = inWin(tau, 15.6, 19.6); const h = c.userData.home, ph = c.userData.ph;
@@ -362,9 +366,9 @@ export function updateWorld(W, t, tau, cam) {
     W.bacs.forEach((b) => { const [a, e] = b.userData.win; b.visible = inWin(t, a - 0.5, e + 0.5) && tau < 21.8; const bk = seg(t, a, e);
       b.position.copy(path(b.userData.path, bk)); const d = b.userData.path[1].clone().sub(b.userData.path[0]); b.rotation.y = Math.atan2(d.x, d.z); b.rotation.x = -Math.atan2(d.y, Math.hypot(d.x, d.z));
       b.userData.flag.forEach((f, j) => { f.rotation.z = t * 20 + j; }); b.rotation.z = t * 4; });
-    W.diatoms.forEach((d, i) => { d.visible = inWin(tau, 13.62, 18.2); d.rotation.y = t * 0.1 + i; });
+    W.diatoms.forEach((d, i) => { d.visible = inWin(tl, 13.62, 18.2); d.rotation.y = t * 0.1 + i; });
   }
-  W.microDust.position.set(0, 2.7, 0); W.microDust.userData.update(tau, (tau > 13.62 ? 0.75 : 0) * (1 - seg(tau, 22.5, 24)), t);
+  W.microDust.position.set(0, 2.7, 0); W.microDust.userData.update(tau, (wet ? 0.75 : 0) * (1 - seg(tau, 22.5, 24)), t);
   W.bubbles.userData.update(t);
   // light waves
   W.waveG.visible = inWin(tau, 20.2, 24.6);
@@ -383,7 +387,9 @@ export function updateWorld(W, t, tau, cam) {
     W.sugars.forEach((s) => { s.visible = inWin(tau, 28.0, 32.6); bob(s, 0.05); });
     // water: jostling molecules; the one Greg drifts into is replaced by the atom visual
     const ws = W.waterSet, tmp = new THREE.Object3D(), hq = new THREE.Vector3(), wv = inWin(tau, 29.5, 35.8);
-    ws.Om.visible = ws.Hm.visible = wv;
+    const wf = 1 - seg(t, 38.9, 40.1);                                  // fade out as the electron cloud takes over
+    ws.Om.visible = ws.Hm.visible = wv && wf > 0.001;
+    for (const m of [ws.Om.material, ws.Hm.material]) { m.transparent = true; m.opacity = wf; m.depthWrite = wf > 0.98; }
     if (wv) { ws.items.forEach((w, i) => {
       const j = v3(Math.sin(t * 3.1 + w.ph), Math.sin(t * 2.7 + w.ph * 1.7), Math.sin(t * 3.4 + w.ph * 2.3)).multiplyScalar(0.035);
       const q = w.q.clone().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.sin(t * 1.3 + w.ph) * 0.6, t * 0.9 + w.ph, 0)));
