@@ -389,7 +389,7 @@ export function updateWorld(W, t, tau, cam) {
     const ws = W.waterSet, tmp = new THREE.Object3D(), hq = new THREE.Vector3(), wv = inWin(tau, 29.5, 35.8);
     const wf = 1 - seg(t, 38.9, 40.1);                                  // fade out as the electron cloud takes over
     ws.Om.visible = ws.Hm.visible = wv && wf > 0.001;
-    for (const m of [ws.Om.material, ws.Hm.material]) { m.transparent = true; m.opacity = wf; m.depthWrite = wf > 0.98; }
+    for (const m of [ws.Om.material, ws.Hm.material]) { m.transparent = true; m.opacity = wf; m.depthWrite = true; } // constant depth write: no draw-order pop
     if (wv) { ws.items.forEach((w, i) => {
       const j = v3(Math.sin(t * 3.1 + w.ph), Math.sin(t * 2.7 + w.ph * 1.7), Math.sin(t * 3.4 + w.ph * 2.3)).multiplyScalar(0.035);
       const q = w.q.clone().multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.sin(t * 1.3 + w.ph) * 0.6, t * 0.9 + w.ph, 0)));
@@ -417,14 +417,14 @@ export function updateWorld(W, t, tau, cam) {
   if (W.nGlow.visible) { W.nGlow.position.copy(Cn); const gs = Math.max(1.2, rn * 3.2); W.nGlow.scale.setScalar(gs); W.nGlow.material.opacity = (tau < 36 ? seg(tau, 34.6, 36) : 1) * (1 - seg(tau, 50.6, 51.7)) * 0.9; }
   if (W.nucG.visible) { W.nucG.position.copy(Cn); W.nucG.scale.setScalar(k * FM);
     for (const n of W.nuc.userData.nucleons) { const ph = n.userData.ph; n.position.copy(n.userData.home).add(v3(Math.sin(t * 7 + ph), Math.sin(t * 6.3 + ph * 2), Math.sin(t * 7.7 + ph * 3)).multiplyScalar(n === W.target ? 0.02 : 0.08)); }
-    const nf = 1 - seg(tau, 51.25, 51.85); W.nucMats.forEach((m) => { m.opacity = nf; m.depthWrite = nf > 0.98; }); W.nuc.visible = nf > 0.001; }
+    const nf = 1 - seg(t, 55.5, 56.3); W.nucMats.forEach((m) => { m.opacity = nf * nf * nf; m.depthWrite = true; }); W.nuc.visible = nf > 0.001; } // ~0.8 s fade as Greg enters the proton
   // ---- inside the proton
   const inside = inWin(tau, 51.4, 60.5);
   W.proG.visible = inside;
   if (inside) {
     const Cp = Cn.clone().add(W.target.userData.home.clone().multiplyScalar(k * FM));
     W.proG.position.copy(Cp); W.proG.scale.setScalar(k * FM);
-    const fadeIn = seg(tau, 51.4, 52.4);
+    const fadeIn = IO(seg(t, 55.9, 56.7));
     W.quarks.forEach((q, i) => { const h = q.userData.home; q.position.copy(h).add(v3(Math.sin(t * 1.3 + i * 2), Math.cos(t * 1.1 + i), Math.sin(t * 0.9 + i * 3)).multiplyScalar(0.06));
       q.scale.setScalar(0.42); q.material.opacity = fadeIn * 0.6 * (1 - seg(tau, 54.5, 58.5) * 0.75); });
     W.gluons.forEach((l, i) => { const a = W.quarks[i].position, b = W.quarks[(i + 1) % 3].position, p = l.geometry.attributes.position;
