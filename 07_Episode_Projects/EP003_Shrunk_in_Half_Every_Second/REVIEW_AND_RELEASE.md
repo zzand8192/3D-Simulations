@@ -13,7 +13,8 @@
 ## Delivery
 
 - **Export:** `03_Delivery/EP003_Shrunk_in_Half_Every_Second_v01.mp4`
-- **Specs:** 1080 × 1920, 30 fps, 75.0 s, stereo AAC, loudness-normalized
+- **Specs:** 1080 × 1920, 30 fps, 75.0 s (2,250 frames), H.264 + stereo AAC, −14.1 LUFS, 72.5 MB
+- **30 fps check:** no one-frame pops, hard cuts or frozen stretches; remaining motion flags are the halving zooms through dense particle fields (intended)
 - **Phone playback check:** pending, for Isaac
 
 ## Release
